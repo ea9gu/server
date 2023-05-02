@@ -12,3 +12,7 @@ docker-compose up -d
 docker build .
 docker-compose build
 docker-compose up
+
+---
+
+settings.py가 바뀌면 `docker-compuse up --build` 필요
