@@ -2,14 +2,17 @@ version: "3"
 
 services:
   web:
+    container_name: django_server
     build:
       context: .
       dockerfile: dockerfile
+    # environment: 
     volumes:
-      - .:/app
+      - .:/server
+    # working_dir: /gongcheck/
     ports:
       - 8000:8000
-    command: bash -c "
-        django-admin startproject gongcheck
-        && python ./gongcheck/manage.py runserver 0.0.0.0:8000
-      "
+    command: bash -c " 
+        python3 ./gongcheck/manage.py migrate &&
+        python3 ./gongcheck/manage.py runserver 0.0.0.0:8000
+        "
