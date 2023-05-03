@@ -15,4 +15,4 @@ docker-compose up
 
 ---
 
-settings.py가 바뀌면 `docker-compuse up --build` 필요
+settings.py가 바뀌면 `docker-compose up --build` 필요
