@@ -16,3 +16,15 @@ docker-compose up
 ---
 
 settings.py가 바뀌면 `docker-compose up --build` 필요
+
+---
+
+# 구현 API
+
+## 로그인 & 회원가입 관련
+✔ 로그인: /user/account/login/
+✔ 로그아웃: /user/account/password/logout/
+✔ 회원가입: /user/account/signup/
+
+✔ 비밀번호 변경: /user/account/password/change/
+✔ 비밀번호 리셋: /user/account/password/reset/
