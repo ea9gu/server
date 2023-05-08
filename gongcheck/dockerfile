@@ -1,0 +1,21 @@
+# Base Image
+FROM python:3.9
+
+# Set work directory
+WORKDIR /app
+
+# Copy the requirements file
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install -r requirements.txt
+
+# Copy the project directory to the work directory
+COPY . .
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Expose port 8000 for the Django server
+EXPOSE 8000
