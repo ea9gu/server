@@ -25,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .managers import UserManager
 
+
 class User(AbstractUser):
     username = models.CharField(max_length=10, unique=True)
 
