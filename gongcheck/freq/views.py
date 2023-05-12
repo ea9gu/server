@@ -9,13 +9,15 @@ from pydub import AudioSegment
 import numpy as np
 from .models import AudioFile
 
+import os
+
 def generate_freq(request):
-    frequency = int(request.GET.get('frequency', 18000))  # 기본 주파수는 18kHz로 설정
+    frequency = int(request.GET.get('frequency', 20000))  # 기본 주파수는 18kHz로 설정
     course_id = int(request.GET.get('course_id', 0))
     number = int(request.GET.get('number', 0))
 
     # 주파수에 해당하는 음성 생성
-    duration = 3000  # 음성의 길이 (3초)
+    duration = 5000  # 음성의 길이 (5초)
     sample_rate = 44100  # 샘플링 속도
     t = np.linspace(0, duration, int(sample_rate * duration / 1000), False)
     audio_data = np.sin(2 * np.pi * frequency * t)
@@ -29,8 +31,9 @@ def generate_freq(request):
         channels=1
     )
 
-    # 음성 파일 저장
-    file_path = f'media/audio/{frequency}.wav'
+    file_path = f'audio_{frequency}.wav'  # audio_18000.wav
+    current_directory = os.getcwd()
+    file_path = os.path.join(current_directory, file_path)
     audio.export(file_path, format='wav')
 
     # 경로를 데이터베이스에 저장
@@ -42,3 +45,4 @@ def generate_freq(request):
     )
 
     return JsonResponse({'file_url': audio_file.get_file_url()})
+    # return JsonResponse({'file_url': file_path})
