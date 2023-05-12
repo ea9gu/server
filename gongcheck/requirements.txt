@@ -5,3 +5,5 @@ dj-rest-auth
 django-allauth
 djangorestframework-simplejwt
 django-dotenv
+pydub==0.25.1
+numpy
