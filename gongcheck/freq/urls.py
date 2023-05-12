@@ -5,5 +5,5 @@ from . import views
 
 urlpatterns = [
     path('generate-freq/', views.generate_freq, name='generate_freq'),
-    # 다른 URL 패턴들을 여기에 추가할 수 있습니다.
+    path('save-attendance/', views.save_attendance, name='save_attendance'),
 ]

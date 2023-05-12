@@ -7,3 +7,4 @@ djangorestframework-simplejwt
 django-dotenv
 pydub==0.25.1
 numpy
+scipy==1.7.0

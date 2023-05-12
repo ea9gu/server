@@ -3,13 +3,15 @@ from django.shortcuts import render
 # Create your views here.
 # 1) def get api(request) : GET요청이 들어오면 Post모델 데이터를 직렬화하여 JSON/XML로 응답하는 함수입니다. 
 # 2) def post_api(request) : POST요청이 들어오면 요청 데이터를 Serializer를 사용해 객체화하여 DB에 담는 함수입니다. 
+from .models import AudioFile, Attendance
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from pydub import AudioSegment
 import numpy as np
-from .models import AudioFile
-
 import os
+import json
+from scipy.io.wavfile import read
+
 
 def generate_freq(request):
     frequency = int(request.GET.get('frequency', 20000))  # 기본 주파수는 18kHz로 설정
@@ -46,3 +48,49 @@ def generate_freq(request):
 
     return JsonResponse({'file_url': audio_file.get_file_url()})
     # return JsonResponse({'file_url': file_path})
+
+
+def save_attendance(request):
+    if request.method == 'POST':
+        # 프론트에서 전달된 데이터 받기
+        data = json.loads(request.body)
+        student_id = data.get('student_id')
+        course_id = data.get('course_id')
+        date = data.get('date')
+        attend = 0 # 기본값은 미출석 처리
+        course_number = data.get('course_number')
+        audio_file = request.FILES.get('recording')
+
+        # Attendance 모델에 데이터 저장
+        attendance = Attendance.objects.create(
+            student_id=student_id,
+            course_id=course_id,
+            date=date,
+            attend=attend,
+            course_number=course_number
+        )
+
+        if audio_file:
+            # 음성 녹음 파일을 저장하고 파일 경로를 얻습니다.
+            file_name = 'record.wav'
+            recording_path = os.path.join(os.getcwd(), file_name)
+            with open(recording_path, 'wb+') as destination:
+                for chunk in audio_file.chunks():
+                    destination.write(chunk)
+
+            # 주파수 분석을 수행합니다.
+            sample_rate, data = read(recording_path)
+            # data를 활용하여 주파수 분석 및 처리를 수행합니다.
+
+            # 주파수 값과 일치하는 AudioFile을 찾습니다.
+            try:
+                audio = AudioFile.objects.get(frequency=data)
+                attendance.attend = 1  # 출석 처리
+                attendance.save()
+                return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
+            except AudioFile.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': '주파수 값과 일치하는 오디오 파일이 없습니다.'})
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
