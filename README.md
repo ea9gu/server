@@ -31,3 +31,8 @@ settings.py가 바뀌면 `docker-compose up --build` 필요
 ✔ 비밀번호 변경: /user/account/password/change/
 
 ✔ 비밀번호 리셋: /user/account/password/reset/
+
+## 주파수 주고받기 관련
+✔ 교수 앱에서 주파수 생성 요청: /freq/generate-freq/
+
+✔ 학생 앱에서 주파수 확인 및 출석체크 요청: /freq/save-attendance/
