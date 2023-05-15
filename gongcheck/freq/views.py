@@ -50,12 +50,16 @@ def generate_freq(request):
 
     return JsonResponse({'file_url': audio_file.get_file_url()})
     # return JsonResponse({'file_url': file_path})
-
+    
 @csrf_exempt
 def save_attendance(request):
     if request.method == 'POST':
         # 프론트에서 전달된 데이터 받기
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except UnicodeDecodeError:
+            return JsonResponse({'status': 'error', 'message': '올바른 인코딩 형식이 아닙니다.'})
+
         student_id = data.get('student_id')
         course_id = data.get('course_id')
         date = data.get('date')
