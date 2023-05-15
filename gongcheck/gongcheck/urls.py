@@ -22,4 +22,5 @@ urlpatterns = [
     # path('api/accounts/v1/', include('accounts.urls')),
     path('user/account/', include('accounts.urls')),
     path('freq/', include('freq.urls')),
+    path('serial/', include('serial.urls')),
 ]
