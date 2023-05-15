@@ -1,24 +1,3 @@
-# from django.contrib.auth.models import AbstractUser
-# from django.db import models
-# from django.utils.translation import gettext_lazy as _
-
-# from .managers import UserManager
-
-# class User(AbstractUser):
-#     # username = None
-#     # email = models.EmailField(_('email address'), unique=True)
-#     username = models.CharField(max_length=10, unique=True)
-#     email = None
-
-#     # USERNAME_FIELD = 'email'
-#     USERNAME_FIELD = 'username'
-#     REQUIRED_FIELDS = []
-
-#     objects = UserManager()
-
-#     def __str__(self):
-#         return self.username
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -26,30 +5,65 @@ from django.utils.translation import gettext_lazy as _
 from .managers import UserManager
 
 
-class User(AbstractUser):
-    username = models.CharField(max_length=10, unique=True)
+class Student(AbstractUser):
+    username = models.CharField(max_length=10, unique=True, verbose_name='학번')
+    name = models.CharField(max_length=255, verbose_name='이름')
 
-    # Add related_name arguments to avoid clashes with auth.User model
     groups = models.ManyToManyField(
         'auth.Group',
-        related_name='custom_user_set',
+        related_name='student_set',
         blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+        help_text='The groups this student belongs to.',
         verbose_name='groups',
     )
     user_permissions = models.ManyToManyField(
         'auth.Permission',
-        related_name='custom_user_set',
+        related_name='student_set',
         blank=True,
-        help_text='Specific permissions for this user.',
+        help_text='Specific permissions for this student.',
         verbose_name='user permissions',
     )
 
-    # Set USERNAME_FIELD and REQUIRED_FIELDS as before
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['name']
 
     objects = UserManager()
 
     def __str__(self):
-        return self.username
+        return self.name
+
+    class Meta:
+        verbose_name = '학생'
+        verbose_name_plural = '학생'
+
+
+class Professor(AbstractUser):
+    username = models.CharField(max_length=10, unique=True, verbose_name='교번')
+    name = models.CharField(max_length=255, verbose_name='이름')
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='professor_set',
+        blank=True,
+        help_text='The groups this professor belongs to.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='professor_set',
+        blank=True,
+        help_text='Specific permissions for this professor.',
+        verbose_name='user permissions',
+    )
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['name']
+
+    objects = UserManager()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '교수'
+        verbose_name_plural = '교수'
