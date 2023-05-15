@@ -1,6 +1,8 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 class UserManager(BaseUserManager):
     # def create_user(self, email, password, **extra_fields):
     def create_user(self, username, password, **extra_fields):

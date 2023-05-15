@@ -12,7 +12,9 @@ import os
 import json
 from scipy.io.wavfile import read
 
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def generate_freq(request):
     frequency = int(request.GET.get('frequency', 20000))  # 기본 주파수는 18kHz로 설정
     course_id = int(request.GET.get('course_id', 0))
@@ -49,7 +51,7 @@ def generate_freq(request):
     return JsonResponse({'file_url': audio_file.get_file_url()})
     # return JsonResponse({'file_url': file_path})
 
-
+@csrf_exempt
 def save_attendance(request):
     if request.method == 'POST':
         # 프론트에서 전달된 데이터 받기
