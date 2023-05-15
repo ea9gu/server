@@ -36,3 +36,6 @@ settings.py가 바뀌면 `docker-compose up --build` 필요
 ✔ 교수 앱에서 주파수 생성 요청: /freq/generate-freq/
 
 ✔ 학생 앱에서 주파수 확인 및 출석체크 요청: /freq/save-attendance/
+
+## 기기 등록 관련
+✔ 기기 등록: /serial/save-device/
