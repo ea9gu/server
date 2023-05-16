@@ -1,29 +1,17 @@
-# models.py
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-# models.py
-from django.contrib.auth.models import User
-from django.db import models
-
-# models.py
-from django.contrib.auth.base_user import BaseUserManager
-from django.utils.translation import gettext_lazy as _
-
 class UserManager(BaseUserManager):
-    def create_user(self, username, name, password, email=None, **extra_fields):
-        if not username:
-            raise ValueError(_('Student Code must be set'))
-        if not name:
-            raise ValueError(_('Name must be set'))
-        
-        user = self.model(username=username, name=name, email=email, **extra_fields)
+    def create_user(self, username, name, password, flag, email=None, **extra_fields):
+        if not username: raise ValueError(_('Student Code must be set'))
+        if not name: raise ValueError(_('Name must be set'))
+        user = self.model(username=username, name=name, email=None, flag=flag, **extra_fields)
         user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, username, name, password, email=None, **extra_fields):
+    def create_superuser(self, username, name, password, flag, email=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
@@ -33,15 +21,13 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
         
-        return self.create_user(username, name, password, email, **extra_fields)
-
+        return self.create_user(username, name, password, flag, email, **extra_fields)
 
 class User(AbstractUser):
     username = models.CharField(max_length=10, unique=True)
     name = models.CharField(max_length=255)
     flag = models.BooleanField()
 
-    # Add related_name arguments to avoid clashes with auth.User model
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='custom_user_set',
@@ -57,9 +43,10 @@ class User(AbstractUser):
         verbose_name='user permissions',
     )
 
-    # Set USERNAME_FIELD and REQUIRED_FIELDS as before
+    email = models.EmailField(_('email address'), blank=True, null=True)
+    
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['name']
+    REQUIRED_FIELDS = ['name', 'flag']
 
     objects = UserManager()
 

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'freq',
     'serial',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'dj_rest_auth',
     'django.contrib.sites',
     'allauth',
@@ -57,11 +58,11 @@ JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
 
 SITE_ID = 1
 ACCOUNT_UNIQUE_USERNAME = False
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'name'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-USER_MODEL_USERNAME_FIELD = 'name'
-
+USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
