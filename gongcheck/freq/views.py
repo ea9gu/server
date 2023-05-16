@@ -48,7 +48,7 @@ def generate_freq(request):
         number=number
     )
 
-    return JsonResponse({'file_url': audio_file.get_file_url()})
+    return JsonResponse({'course_id': course_id, 'file_url': audio_file.get_file_url()})
     # return JsonResponse({'file_url': file_path})
     
 @csrf_exempt
