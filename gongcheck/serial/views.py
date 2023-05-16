@@ -66,19 +66,6 @@ def get_device(request):
                 'timestamp': recent_device.timestamp
             }
             return JsonResponse(response_data)
-        
-        # Device 모델에 데이터 저장
-        device = Device.objects.create(
-            student_id=student_id,
-            device_name=device_name,
-            device_serial=device_serial
-        )
-
-        # 현재 저장된 Device 출력
-        devices = Device.objects.all().values()
-        device_list = list(devices)
-        print(device_list)
-
-        return JsonResponse({'status': 'success'})
+        else: return JsonResponse({'status': 'error', 'message': '등록된 디바이스가 없습니다.'})
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
