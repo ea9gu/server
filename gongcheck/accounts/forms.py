@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import User
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(required=False)
@@ -18,5 +18,5 @@ class SignUpForm(UserCreationForm):
         user.email = self.cleaned_data['email']
         if commit:
             user.save()
-            UserProfile.objects.create(user=user, name=self.cleaned_data['name'], flag=self.cleaned_data['flag'])
+            User.objects.create(user=user, name=self.cleaned_data['name'], flag=self.cleaned_data['flag'])
         return user

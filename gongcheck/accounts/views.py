@@ -1,37 +1,43 @@
-from django.http import JsonResponse
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserJWTSignupSerializer
+from django.shortcuts import render
+from django.contrib.auth.models import User
 
-class JWTSignupView(APIView):
-    serializer_class = UserJWTSignupSerializer
+def view_user_info(request):
+    users = User.objects.all()  # 모든 사용자 가져오기
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+    return render(request, 'user_info.html', {'users': users})
 
-        if serializer.is_valid():
-            user = serializer.save()
-
-            token = RefreshToken.for_user(user)
-            refresh = str(token)
-            access = str(token.access_token)
-
-            return JsonResponse({'user': serializer.data,
-                                 'access': access,
-                                 'refresh': refresh})
-        else:
-            return JsonResponse(serializer.errors, status=400)
-
-from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
+from django.shortcuts import redirect, render
 from .forms import SignUpForm
+from .models import User
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
+User = get_user_model()
 
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Optionally, perform additional actions after successful signup
-            return redirect('home')  # Replace 'home' with the desired URL
+            username = form.cleaned_data['username']
+            name = form.cleaned_data['name']
+            flag = form.cleaned_data['flag']
+            password = form.cleaned_data['password1']
+
+            user = User.objects.create_user(username=username, password=password)
+            user.name = name
+            user.flag = flag
+            user.save()
+
+            refresh = RefreshToken.for_user(user)
+            token = str(refresh.access_token)
+
+            # 토큰을 쿠키에 저장
+            response = redirect('home')
+            response.set_cookie(key='jwt', value=token, httponly=True)
+
+            return response
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+

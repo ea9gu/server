@@ -24,6 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ap0z7z0#p)ec)^p!t$y6zc87k@&=6iwhexui-8f6w96uzy#+gy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -55,6 +56,8 @@ INSTALLED_APPS = [
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'my-app-auth'
 JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+
+AUTH_USER_MODEL = 'accounts.User'
 
 SITE_ID = 1
 ACCOUNT_UNIQUE_USERNAME = False
