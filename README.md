@@ -39,3 +39,9 @@ settings.py가 바뀌면 `docker-compose up --build` 필요
 
 ## 기기 등록 관련
 ✔ 기기 등록: /serial/save-device/
+
+
+## 수업 등록 및 관리 관련
+✔ 기기 등록: /class/create-course/
+
+✔ csv 파일로 수강 학생 등록: /class/enroll-students/
