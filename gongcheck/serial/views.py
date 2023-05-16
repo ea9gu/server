@@ -24,7 +24,7 @@ def save_device(request):
             response_data = {
                 'status': 'error',
                 'message': '이미 등록된 디바이스입니다.',
-                'device_id': recent_device.id,
+                'device_id': recent_device.device_serial,
                 'device_name': recent_device.device_name,
                 'timestamp': recent_device.timestamp
             }
@@ -61,7 +61,7 @@ def get_device(request):
             response_data = {
                 'status': 'success',
                 'message': '등록된 디바이스가 있습니다',
-                'device_id': recent_device.id,
+                'device_id': recent_device.device_serial,
                 'device_name': recent_device.device_name,
                 'timestamp': recent_device.timestamp
             }
