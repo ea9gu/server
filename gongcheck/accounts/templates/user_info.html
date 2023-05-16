@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User 정보</title>
+</head>
+<body>
+    <h1>User 정보</h1>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Flag</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.flag }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
