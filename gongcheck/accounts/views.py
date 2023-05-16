@@ -11,7 +11,9 @@ from django.shortcuts import redirect, render
 from .forms import SignUpForm
 from .models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.shortcuts import redirect, render
+from .forms import SignUpForm
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -24,7 +26,7 @@ def signup(request):
             flag = form.cleaned_data['flag']
             password = form.cleaned_data['password1']
 
-            user = User.objects.create_user(username=username, password=password)
+            user = User.objects.create_user(username=username, password=password, name=name, flag=flag)
             user.name = name
             user.flag = flag
             user.save()
@@ -32,12 +34,11 @@ def signup(request):
             refresh = RefreshToken.for_user(user)
             token = str(refresh.access_token)
 
-            # 토큰을 쿠키에 저장
-            response = redirect('home')
-            response.set_cookie(key='jwt', value=token, httponly=True)
+            # # 토큰을 쿠키에 저장
+            # response = redirect('home')
+            # response.set_cookie(key='jwt', value=token, httponly=True)
 
-            return response
+            return redirect('/user/account/view_user_info/')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
-

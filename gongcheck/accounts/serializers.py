@@ -20,7 +20,7 @@ class UserJWTSignupSerializer(serializers.ModelSerializer):
         write_only=True,
     )
 
-    flag = serializers.DateField(
+    flag = serializers.BooleanField(
         required=True,
         write_only=True,
     )
@@ -42,7 +42,6 @@ class UserJWTSignupSerializer(serializers.ModelSerializer):
         )
 
         user.set_password(self.validated_data['password'])
-        user.subscription_date = date.today()
         user.save()
 
         return user
