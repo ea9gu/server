@@ -5,7 +5,9 @@ from django.contrib.auth.models import User
 
 import csv
 from io import StringIO
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def create_course(request):
     if request.method == 'POST':
         course_name = request.POST.get('course_name')
@@ -24,7 +26,6 @@ def create_course(request):
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
-
 
 
 def enroll_students(request):

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'freq',
     'serial',
+    'class',
     'rest_framework.authtoken',
     'dj_rest_auth',
     'django.contrib.sites',
