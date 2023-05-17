@@ -26,8 +26,13 @@ def create_and_enroll(request):
         if not course_name or not professor_id or not course_id or not csv_file:
             return JsonResponse({'status': 'error', 'message': '요청 데이터가 부족합니다.'})
 
-        # Create the course
-        course, _ = Course.objects.get_or_create(course_id=course_id, defaults={'name': course_name, 'professor_id': professor_id})
+        # 새로운 course이면 생성하고, 아니면 기존의 data를 불러오도록 함
+        course, created = Course.objects.get_or_create(course_id=course_id, defaults={'name': course_name, 'professor_id': professor_id})
+
+        if not created:
+            course.name = course_name
+            course.professor_id = professor_id
+            course.save()
 
         # CSV 파일을 문자열로 읽어옴
         csv_data = csv_file.read().decode('utf-8')
@@ -64,7 +69,6 @@ def create_and_enroll(request):
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
 
-@api_view(['POST'])
 @csrf_exempt
 def send_signal_to_flutter(request):
     if request.method == 'POST':
@@ -73,7 +77,7 @@ def send_signal_to_flutter(request):
 
         # Check if both class_id and student_id are provided
         if not class_id or not student_id:
-            return Response({'status': 'error'})
+            return JsonResponse({'status': 'error'})
 
         # Get the current datetime
         current_datetime = datetime.now()
@@ -81,12 +85,16 @@ def send_signal_to_flutter(request):
         # Calculate the datetime threshold (10 minutes ago)
         threshold_datetime = current_datetime - timedelta(minutes=10)
 
-        try: latest_audio_file = AudioFile.objects.filter(class_id=class_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
+        try:
+            latest_audio_file = AudioFile.objects.filter(class_id=class_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
 
             # Check if the latest audio file is within the 10-minute timeframe
-            if latest_audio_file.created_at >= threshold_datetime: return Response({'status': 'check'})
-            else: return Response({'status': 'bluecheck'})
+            if latest_audio_file.created_at >= threshold_datetime:
+                return JsonResponse({'status': 'check'})
+            else:
+                return JsonResponse({'status': 'bluecheck'})
 
-        except AudioFile.DoesNotExist: return Response({'status': 'bluecheck'})
+        except AudioFile.DoesNotExist:
+            return JsonResponse({'status': 'bluecheck'})
 
-    return Response({'status': 'error'})
+    return JsonResponse({'status': 'error'})
