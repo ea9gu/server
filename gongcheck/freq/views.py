@@ -55,17 +55,18 @@ def generate_freq(request):
 def save_attendance(request):
     if request.method == 'POST':
         # 프론트에서 전달된 데이터 받기
-        try:
-            data = json.loads(request.body.decode('utf-8'))
-        except UnicodeDecodeError:
-            return JsonResponse({'status': 'error', 'message': '올바른 인코딩 형식이 아닙니다.'})
+        try: data = json.loads(request.body.decode('utf-8'))
+        except UnicodeDecodeError: return JsonResponse({'status': 'error', 'message': '올바른 인코딩 형식이 아닙니다.'})
 
         student_id = data.get('student_id')
         course_id = data.get('course_id')
         date = data.get('date')
         attend = 0 # 기본값은 미출석 처리
-        course_number = data.get('course_number')
         audio_file = request.FILES.get('recording')
+
+        latest_attendance = Attendance.objects.filter(course_id=course_id).order_by('-course_number').first()
+        if latest_attendance: course_number = latest_attendance.course_number + 1
+        else: course_number = 1
 
         # Attendance 모델에 데이터 저장
         attendance = Attendance.objects.create(
