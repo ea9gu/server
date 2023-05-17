@@ -16,7 +16,9 @@ from .forms import SignUpForm
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
