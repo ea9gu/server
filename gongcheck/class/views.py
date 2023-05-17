@@ -29,7 +29,6 @@ def create_and_enroll(request):
         # Create the course
         course, _ = Course.objects.get_or_create(course_id=course_id, defaults={'name': course_name, 'professor_id': professor_id})
 
-
         # CSV 파일을 문자열로 읽어옴
         csv_data = csv_file.read().decode('utf-8')
 
