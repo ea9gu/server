@@ -24,6 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ap0z7z0#p)ec)^p!t$y6zc87k@&=6iwhexui-8f6w96uzy#+gy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'serial',
     'class',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'dj_rest_auth',
     'django.contrib.sites',
     'allauth',
@@ -56,24 +58,15 @@ REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'my-app-auth'
 JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
 
+AUTH_USER_MODEL = 'accounts.User'
+
 SITE_ID = 1
-# # ACCOUNT_UNIQUE_EMAIL = True
-# AUTH_USER_MODEL = 'accounts.User'
-# ACCOUNT_UNIQUE_USERNAME = True
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = True
-# USER_MODEL_USERNAME_FIELD = 'username'
-# ACCOUNT_USERNAME_REQUIRED = True
-# # ACCOUNT_EMAIL_REQUIRED = True
-# # ACCOUNT_AUTHENTICATION_METHOD = 'email'
-# ACCOUNT_AUTHENTICATION_METHOD ="username"
-# ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_UNIQUE_USERNAME = True
+ACCOUNT_UNIQUE_USERNAME = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = "username"
-# ACCOUNT_EMAIL_VERIFICATION = 'none'
-
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -9,7 +9,6 @@ import csv
 from io import StringIO
 import json
 
-
 @csrf_exempt
 def create_course(request):
     if request.method == 'POST':
@@ -79,3 +78,18 @@ def enroll_students(request):
     
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
 
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import StudentCourse
+
+@api_view(['POST'])
+@csrf_exempt
+def send_signal_to_flutter(request):
+    class_id = request.data.get('class_id')
+    
+    student_ids = StudentCourse.objects.filter(course_id=class_id).values_list('student_id', flat=True)
+    
+    # TODO: 플러터 앱에 신호를 보내는 코드 추가
+    
+    return Response({'status': 'success'})

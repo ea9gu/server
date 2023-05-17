@@ -13,10 +13,11 @@ def save_device(request):
         data = json.loads(request.body)
         device_name = data.get('device_name')
         device_serial = data.get('device_serial')
+        student_id = data.get('student_id')
 
         # Device 모델에서 같은 device_name을 가진 최근의 데이터 찾기
         two_weeks_ago = datetime.now() - timedelta(weeks=2)
-        recent_device = Device.objects.filter(device_name=device_name, timestamp__gte=two_weeks_ago).first()
+        recent_device = Device.objects.filter(student_id=student_id, timestamp__gte=two_weeks_ago).first()
 
         # 만약 최근 2주 내에 같은 이름의 디바이스가 등록되었다면, 에러 메시지 반환
         if recent_device:
