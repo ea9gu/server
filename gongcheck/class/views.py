@@ -9,6 +9,9 @@ import csv
 from io import StringIO
 import json
 
+from datetime import datetime, timedelta
+from freq.models import AudioFile
+
 @csrf_exempt
 def create_and_enroll(request):
     if request.method == 'POST':
@@ -62,17 +65,29 @@ def create_and_enroll(request):
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
 
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .models import StudentCourse
-
 @api_view(['POST'])
 @csrf_exempt
 def send_signal_to_flutter(request):
-    class_id = request.data.get('class_id')
-    
-    student_ids = StudentCourse.objects.filter(course_id=class_id).values_list('student_id', flat=True)
-    
-    # TODO: 플러터 앱에 신호를 보내는 코드 추가
-    
-    return Response({'status': 'success'})
+    if request.method == 'POST':
+        class_id = request.data.get('class_id')
+        student_id = request.data.get('student_id')
+
+        # Check if both class_id and student_id are provided
+        if not class_id or not student_id:
+            return Response({'status': 'error'})
+
+        # Get the current datetime
+        current_datetime = datetime.now()
+
+        # Calculate the datetime threshold (10 minutes ago)
+        threshold_datetime = current_datetime - timedelta(minutes=10)
+
+        try: latest_audio_file = AudioFile.objects.filter(class_id=class_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
+
+            # Check if the latest audio file is within the 10-minute timeframe
+            if latest_audio_file.created_at >= threshold_datetime: return Response({'status': 'check'})
+            else: return Response({'status': 'bluecheck'})
+
+        except AudioFile.DoesNotExist: return Response({'status': 'bluecheck'})
+
+    return Response({'status': 'error'})
