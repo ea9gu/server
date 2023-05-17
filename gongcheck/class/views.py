@@ -34,7 +34,7 @@ def create_course(request):
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
 
-
+@csrf_exempt
 def enroll_students(request):
     if request.method == 'POST':
         course_id = request.POST.get('course_id')
