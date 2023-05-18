@@ -72,7 +72,7 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return JsonResponse({'status': 'success'})
+                return JsonResponse({'status': 'success',  'flag': user.flag})
     else:
         form = AuthenticationForm()
     return JsonResponse({'status': 'fail'})
