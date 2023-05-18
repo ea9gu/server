@@ -26,7 +26,8 @@ def save_device(request):
         # Device 모델에 데이터 저장
         device = Device.objects.create(
             device_name=device_name,
-            device_serial=device_serial
+            device_serial=device_serial,
+            student_id=student_id
         )
 
         # 현재 저장된 Device 출력

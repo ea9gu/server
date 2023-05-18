@@ -43,8 +43,6 @@ def create_and_enroll(request):
         csv_reader = csv.reader(StringIO(csv_data))
         for row in csv_reader:
             student_id = row[0]  # 학생 번호가 있는 열을 지정해야 함
-            print("hi")
-            print(student_id)
             # User 정보 확인
             try:
                 user = User.objects.get(username=student_id, flag=0)

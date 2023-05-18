@@ -5,3 +5,4 @@ class Device(models.Model):
     device_name = models.CharField(max_length=100)
     device_serial = models.CharField(max_length=100)
     timestamp = models.DateTimeField(auto_now_add=True)
+    student_id = models.CharField(max_length=100)
