@@ -73,11 +73,10 @@ def create_and_enroll(request):
 @csrf_exempt
 def send_signal_to_flutter(request):
     if request.method == 'POST':
-        class_id = request.POST.get('class_id')
+        course_id = request.POST.get('course_id')
         student_id = request.POST.get('student_id')
 
-        # Check if both class_id and student_id are provided
-        if not class_id or not student_id:
+        if not course_id or not student_id:
             return JsonResponse({'status': 'error'})
 
         # Get the current datetime
@@ -88,7 +87,7 @@ def send_signal_to_flutter(request):
         threshold_datetime = current_datetime - timedelta(minutes=10)
 
         try:
-            audio_file = AudioFile.objects.filter(class_id=class_id, student_id=student_id).latest('created_at')
+            audio_file = AudioFile.objects.filter(course_id=course_id, student_id=student_id).latest('created_at')
             activation_duration = timedelta(minutes=audio_file.activation_duration)
             # # Check if the latest audio file is within the 10-minute timeframe
             # if latest_audio_file.created_at >= threshold_datetime:
@@ -103,7 +102,7 @@ def send_signal_to_flutter(request):
         threshold_datetime = current_datetime - activation_duration
 
         try:
-            latest_audio_file = Attendance.objects.filter(class_id=class_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
+            latest_audio_file = Attendance.objects.filter(course_id=course_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
 
             # Check if the latest audio file is within the activation_duration timeframe
             if latest_audio_file.created_at >= threshold_datetime:
