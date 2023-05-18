@@ -10,6 +10,7 @@ class Course(models.Model):
         return self.name
 
 class StudentCourse(models.Model):
+    # 특정 과목을 듣는 학생들을 저장하는 db
     student_id = models.IntegerField()  # 학생의 ID를 저장
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
 
