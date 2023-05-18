@@ -16,10 +16,10 @@ from freq.models import AudioFile, Attendance
 def create_and_enroll(request):
     if request.method == 'POST':
         # Extract data from the request
-        data = json.loads(request.body)
-        course_name = data.get('course_name')
-        professor_id = data.get('professor_id')
-        course_id = data.get('course_id')
+        #data = json.loads(request.body)
+        course_name =  request.POST.get('course_name')
+        professor_id =  request.POST.get('professor_id')
+        course_id =  request.POST.get('course_id')
         csv_file = request.FILES.get('csv_file')
 
         # Check if all required data is provided
@@ -43,7 +43,8 @@ def create_and_enroll(request):
         csv_reader = csv.reader(StringIO(csv_data))
         for row in csv_reader:
             student_id = row[0]  # 학생 번호가 있는 열을 지정해야 함
-
+            print("hi")
+            print(student_id)
             # User 정보 확인
             try:
                 user = User.objects.get(username=student_id, flag=0)

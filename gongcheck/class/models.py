@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 class Course(models.Model):
     course_id = models.CharField(max_length=10, unique=True)
     name = models.CharField(max_length=100)
-    professor_id = models.IntegerField()  # 교수의 ID를 저장
+    professor_id = models.CharField(max_length=10) # 교수의 ID를 저장
 
     def __str__(self):
         return self.name
