@@ -10,7 +10,7 @@ from io import StringIO
 import json
 
 from datetime import datetime, timedelta
-from freq.models import AudioFile
+from freq.models import AudioFile, Attendance
 
 @csrf_exempt
 def create_and_enroll(request):
@@ -103,7 +103,7 @@ def send_signal_to_flutter(request):
         threshold_datetime = current_datetime - activation_duration
 
         try:
-            latest_audio_file = AudioFile.objects.filter(class_id=class_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
+            latest_audio_file = Attendance.objects.filter(class_id=class_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
 
             # Check if the latest audio file is within the activation_duration timeframe
             if latest_audio_file.created_at >= threshold_datetime:
@@ -111,7 +111,7 @@ def send_signal_to_flutter(request):
             else:
                 return JsonResponse({'status': 'bluecheck'})
 
-        except AudioFile.DoesNotExist:
+        except Attendance.DoesNotExist:
             return JsonResponse({'status': 'bluecheck'})
 
     return JsonResponse({'status': 'error'})
