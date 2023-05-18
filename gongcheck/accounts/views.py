@@ -10,6 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import redirect, render
 from .forms import SignUpForm
 from django.http import JsonResponse
+import json
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
@@ -60,10 +61,12 @@ def signup(request):
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        data = json.loads(request.body)
+        form = AuthenticationForm(request, data=data)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+            print(username)
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
