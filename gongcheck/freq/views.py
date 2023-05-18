@@ -19,6 +19,7 @@ def generate_freq(request):
     frequency = int(request.GET.get('frequency', 20000))  # 기본 주파수는 18kHz로 설정
     course_id = int(request.GET.get('course_id', 0))
     number = int(request.GET.get('number', 0))
+    activation_duration = int(request.GET.get('activation_duration', 5))
 
     # 주파수에 해당하는 음성 생성
     duration = 5000  # 음성의 길이 (5초)
@@ -45,7 +46,8 @@ def generate_freq(request):
         frequency=frequency,
         file_path=file_path,
         course_id=course_id,
-        number=number
+        number=number,
+        activation_duration=activation_duration,
     )
 
     return JsonResponse({'course_id': course_id, 'file_url': audio_file.get_file_url()})

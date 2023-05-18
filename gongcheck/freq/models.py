@@ -6,7 +6,7 @@ class AudioFile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     course_id = models.IntegerField()
     number = models.IntegerField()
-
+    activation_duration = models.IntegerField()
     def get_file_url(self):
         return self.file_path
 

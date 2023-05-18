@@ -83,13 +83,29 @@ def send_signal_to_flutter(request):
         # Get the current datetime
         current_datetime = datetime.now()
 
+        activation_duration = timedelta(minutes = 5)  # Default activation duration if not found in the database
         # Calculate the datetime threshold (10 minutes ago)
         threshold_datetime = current_datetime - timedelta(minutes=10)
 
         try:
+            audio_file = AudioFile.objects.filter(class_id=class_id, student_id=student_id).latest('created_at')
+            activation_duration = timedelta(minutes=audio_file.activation_duration)
+            # # Check if the latest audio file is within the 10-minute timeframe
+            # if latest_audio_file.created_at >= threshold_datetime:
+            #     return JsonResponse({'status': 'check'})
+            # else:
+            #     return JsonResponse({'status': 'bluecheck'})
+
+        except AudioFile.DoesNotExist:
+            return JsonResponse({'status': 'bluecheck'})
+        
+        # Calculate the datetime threshold (activation_duration minutes ago)
+        threshold_datetime = current_datetime - activation_duration
+
+        try:
             latest_audio_file = AudioFile.objects.filter(class_id=class_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
 
-            # Check if the latest audio file is within the 10-minute timeframe
+            # Check if the latest audio file is within the activation_duration timeframe
             if latest_audio_file.created_at >= threshold_datetime:
                 return JsonResponse({'status': 'check'})
             else:
