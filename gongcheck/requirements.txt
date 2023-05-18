@@ -3,7 +3,7 @@ djangorestframework==3.12.4
 mysqlclient==2.0.3
 dj-rest-auth
 django-allauth
-djangorestframework-simplejwt
+djangorestframework-simplejwt==4.6.0
 django-dotenv
 pydub==0.25.1
 numpy

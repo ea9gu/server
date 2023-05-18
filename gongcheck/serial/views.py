@@ -14,6 +14,7 @@ def save_device(request):
         student_id = data.get('student_id')
         device_name = data.get('device_name')
         device_serial = data.get('device_serial')
+        student_id = data.get('student_id')
 
         # Device 모델에서 같은 device_name을 가진 최근의 데이터 찾기
         two_weeks_ago = timezone.now() - timezone.timedelta(weeks=2)
