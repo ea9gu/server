@@ -69,11 +69,12 @@ def create_and_enroll(request):
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
 
+
 @csrf_exempt
 def send_signal_to_flutter(request):
     if request.method == 'POST':
-        class_id = request.data.get('class_id')
-        student_id = request.data.get('student_id')
+        class_id = request.POST.get('class_id')
+        student_id = request.POST.get('student_id')
 
         # Check if both class_id and student_id are provided
         if not class_id or not student_id:
