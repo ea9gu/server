@@ -87,7 +87,7 @@ def send_signal_to_flutter(request):
         threshold_datetime = current_datetime - timedelta(minutes=10)
 
         try:
-            audio_file = AudioFile.objects.filter(course_id=course_id, student_id=student_id).latest('created_at')
+            audio_file = AudioFile.objects.filter(course_id=course_id).latest('created_at')
             activation_duration = timedelta(minutes=audio_file.activation_duration)
             # # Check if the latest audio file is within the 10-minute timeframe
             # if latest_audio_file.created_at >= threshold_datetime:
