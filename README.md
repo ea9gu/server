@@ -47,6 +47,9 @@ settings.py가 바뀌면 `docker-compose up --build` 필요
 
 ✔ csv 파일로 수강 학생 등록: /class/enroll-students/ -->
 
+## 과목 정보 관련
+✔ 특정 학생이 듣는 모든 수업 정보 가져오기: /class/student-course/
+
 ---
 
 ```mysql
