@@ -49,3 +49,58 @@ settings.py가 바뀌면 `docker-compose up --build` 필요
 
 ---
 
+```mysql
+mysql -u root -p
+
+USE test;
+
+SHOW tables;
+
+SELECT * FROM class_course;
+
+INSERT INTO class_course (course_id, name, professor_id)
+    -> VALUES ('C001', 'Mathematics', 123),
+    ->        ('C002', 'Physics', 456),
+    ->        ('C003', 'Chemistry', 789);
+Query OK, 3 rows affected (0.06 sec)
+
+mysql> INSERT INTO class_studentcourse (student_id, course_id_id)
+    -> VALUES (1, (SELECT id FROM class_course WHERE course_id = 'C001')),
+    -> (1, (SELECT id FROM class_course WHERE course_id = 'C002')),
+    -> (2, (SELECT id FROM class_course WHERE course_id = 'C001')),
+    -> (3, (SELECT id FROM class_course WHERE course_id = 'C003'));
+Query OK, 4 rows affected (0.04 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+```
+
+---
+
+```shell
++--------------------------------+
+| Tables_in_test                 |
++--------------------------------+
+| account_emailaddress           |
+| account_emailconfirmation      |
+| accounts_user                  |
+| accounts_user_groups           |
+| accounts_user_user_permissions |
+| auth_group                     |
+| auth_group_permissions         |
+| auth_permission                |
+| authtoken_token                |
+| class_course                   |
+| class_studentcourse            |
+| django_admin_log               |
+| django_content_type            |
+| django_migrations              |
+| django_session                 |
+| django_site                    |
+| freq_attendance                |
+| freq_audiofile                 |
+| serial_device                  |
+| socialaccount_socialaccount    |
+| socialaccount_socialapp        |
+| socialaccount_socialapp_sites  |
+| socialaccount_socialtoken      |
++--------------------------------+
+```
