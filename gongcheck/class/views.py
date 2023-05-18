@@ -10,7 +10,7 @@ from io import StringIO
 import json
 
 from datetime import datetime, timedelta
-from freq.models import AudioFile
+from freq.models import AudioFile, Attendance
 
 @csrf_exempt
 def create_and_enroll(request):
@@ -73,29 +73,44 @@ def create_and_enroll(request):
 @csrf_exempt
 def send_signal_to_flutter(request):
     if request.method == 'POST':
-        class_id = request.POST.get('class_id')
+        course_id = request.POST.get('course_id')
         student_id = request.POST.get('student_id')
 
-        # Check if both class_id and student_id are provided
-        if not class_id or not student_id:
+        if not course_id or not student_id:
             return JsonResponse({'status': 'error'})
 
         # Get the current datetime
         current_datetime = datetime.now()
 
+        activation_duration = timedelta(minutes = 5)  # Default activation duration if not found in the database
         # Calculate the datetime threshold (10 minutes ago)
         threshold_datetime = current_datetime - timedelta(minutes=10)
 
         try:
-            latest_audio_file = AudioFile.objects.filter(class_id=class_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
+            audio_file = AudioFile.objects.filter(course_id=course_id).latest('created_at')
+            activation_duration = timedelta(minutes=audio_file.activation_duration)
+            # # Check if the latest audio file is within the 10-minute timeframe
+            # if latest_audio_file.created_at >= threshold_datetime:
+            #     return JsonResponse({'status': 'check'})
+            # else:
+            #     return JsonResponse({'status': 'bluecheck'})
 
-            # Check if the latest audio file is within the 10-minute timeframe
+        except AudioFile.DoesNotExist:
+            return JsonResponse({'status': 'bluecheck'})
+        
+        # Calculate the datetime threshold (activation_duration minutes ago)
+        threshold_datetime = current_datetime - activation_duration
+
+        try:
+            latest_audio_file = Attendance.objects.filter(course_id=course_id, student_id=student_id, created_at__gte=threshold_datetime).latest('created_at')
+
+            # Check if the latest audio file is within the activation_duration timeframe
             if latest_audio_file.created_at >= threshold_datetime:
                 return JsonResponse({'status': 'check'})
             else:
                 return JsonResponse({'status': 'bluecheck'})
 
-        except AudioFile.DoesNotExist:
+        except Attendance.DoesNotExist:
             return JsonResponse({'status': 'bluecheck'})
 
     return JsonResponse({'status': 'error'})
