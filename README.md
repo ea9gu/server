@@ -46,3 +46,6 @@ settings.py가 바뀌면 `docker-compose up --build` 필요
 <!-- ✔ 수업 등록: /class/create-course/
 
 ✔ csv 파일로 수강 학생 등록: /class/enroll-students/ -->
+
+---
+
