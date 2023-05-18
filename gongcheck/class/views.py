@@ -105,3 +105,26 @@ def send_signal_to_flutter(request):
             return JsonResponse({'status': 'bluecheck'})
 
     return JsonResponse({'status': 'error'})
+
+
+@csrf_exempt
+def get_student_course(request):
+    if request.method == 'GET':
+        student_id = request.GET.get('student_id')
+
+        if student_id is not None:
+            courses = StudentCourse.objects.filter(student_id=student_id)
+            course_list = []
+
+            for course in courses:
+                course_info = {
+                    'class_id': course.course_id.course_id,
+                    'name': course.course_id.name
+                }
+                course_list.append(course_info)
+
+            return JsonResponse({'courses': course_list})
+        else:
+            return JsonResponse({'error': 'student_id parameter is required.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)

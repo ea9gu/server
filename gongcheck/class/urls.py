@@ -8,4 +8,5 @@ urlpatterns = [
     # path('enroll-students/', views.enroll_students, name='enroll_students'),
     path('create-and-enroll/', views.create_and_enroll, name='create_and_enroll'),
     path('activate-signal/', views.send_signal_to_flutter, name='send_signal_to_flutter'),
+    path('student-course/', views.get_student_course, name='get_student_course'),
 ]
