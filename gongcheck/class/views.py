@@ -12,6 +12,8 @@ import json
 from datetime import datetime, timedelta
 from freq.models import AudioFile, Attendance
 
+from django.shortcuts import get_object_or_404
+
 @csrf_exempt
 def create_and_enroll(request):
     if request.method == 'POST':
@@ -113,6 +115,28 @@ def get_student_course(request):
 
         if student_id is not None:
             courses = StudentCourse.objects.filter(student_id=student_id)
+            course_list = []
+
+            for course in courses:
+                course_info = {
+                    'class_id': course.course_id.course_id,
+                    'name': course.course_id.name
+                }
+                course_list.append(course_info)
+
+            return JsonResponse({'courses': course_list})
+        else:
+            return JsonResponse({'error': 'student_id parameter is required.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+    
+@csrf_exempt
+def get_prof_course(request):
+    if request.method == 'GET':
+        professor_id = request.GET.get('professor_id')
+
+        if professor_id is not None:
+            courses = Course.objects.filter(professor_id=professor_id)
             course_list = []
 
             for course in courses:
