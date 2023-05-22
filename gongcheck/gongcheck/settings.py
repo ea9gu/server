@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'accounts',
     'freq',
     'serial',
+    'class',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'dj_rest_auth',
@@ -109,6 +110,10 @@ DATABASES = {
         'PASSWORD': os.environ.get("DB_PASSWORD"),
         'HOST': 'mysql-server',
         'PORT': os.environ.get("DB_PORT", '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 

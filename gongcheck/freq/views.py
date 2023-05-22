@@ -19,6 +19,7 @@ def generate_freq(request):
     frequency = int(request.GET.get('frequency', 20000))  # 기본 주파수는 18kHz로 설정
     course_id = int(request.GET.get('course_id', 0))
     number = int(request.GET.get('number', 0))
+    activation_duration = int(request.GET.get('activation_duration', 5))
 
     # 주파수에 해당하는 음성 생성
     duration = 5000  # 음성의 길이 (5초)
@@ -45,23 +46,29 @@ def generate_freq(request):
         frequency=frequency,
         file_path=file_path,
         course_id=course_id,
-        number=number
+        number=number,
+        activation_duration=activation_duration,
     )
 
-    return JsonResponse({'file_url': audio_file.get_file_url()})
+    return JsonResponse({'course_id': course_id, 'file_url': audio_file.get_file_url()})
     # return JsonResponse({'file_url': file_path})
-
+    
 @csrf_exempt
 def save_attendance(request):
     if request.method == 'POST':
         # 프론트에서 전달된 데이터 받기
-        data = json.loads(request.body)
+        try: data = json.loads(request.body.decode('utf-8'))
+        except UnicodeDecodeError: return JsonResponse({'status': 'error', 'message': '올바른 인코딩 형식이 아닙니다.'})
+
         student_id = data.get('student_id')
         course_id = data.get('course_id')
         date = data.get('date')
         attend = 0 # 기본값은 미출석 처리
-        course_number = data.get('course_number')
         audio_file = request.FILES.get('recording')
+
+        latest_attendance = Attendance.objects.filter(course_id=course_id).order_by('-course_number').first()
+        if latest_attendance: course_number = latest_attendance.course_number + 1
+        else: course_number = 1
 
         # Attendance 모델에 데이터 저장
         attendance = Attendance.objects.create(

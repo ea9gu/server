@@ -1,10 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-
-def view_user_info(request):
-    users = User.objects.all()  # 모든 사용자 가져오기
-
-    return render(request, 'user_info.html', {'users': users})
+from django.http import JsonResponse
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect, render
@@ -13,13 +9,30 @@ from .models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import redirect, render
 from .forms import SignUpForm
-from django.contrib.auth import get_user_model
+from django.http import JsonResponse
+import json
+
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login
+
+from django.views.decorators.csrf import csrf_exempt
+
+import json
 
 User = get_user_model()
 
+@csrf_exempt
+def view_user_info(request):
+    users = User.objects.all()  # 모든 사용자 가져오기
+    return render(request, 'user_info.html', {'users': users})
+
+@csrf_exempt
 def signup(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        data = json.loads(request.body)
+        #print(data)
+        form = SignUpForm(data)
+        #print(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             name = form.cleaned_data['name']
@@ -38,7 +51,28 @@ def signup(request):
             # response = redirect('home')
             # response.set_cookie(key='jwt', value=token, httponly=True)
 
-            return redirect('/user/account/view_user_info/')
+            #return redirect('/user/account/view_user_info/')
+            return JsonResponse({'status': 'success'})
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'status': 'error', 'errors': errors})
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+@csrf_exempt
+def login_view(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        form = AuthenticationForm(request, data=data)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            print(username)
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return JsonResponse({'status': 'success',  'flag': user.flag})
+    else:
+        form = AuthenticationForm()
+    return JsonResponse({'status': 'fail'})

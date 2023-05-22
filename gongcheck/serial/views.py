@@ -14,7 +14,6 @@ def save_device(request):
         student_id = data.get('student_id')
         device_name = data.get('device_name')
         device_serial = data.get('device_serial')
-        student_id = data.get('student_id')
 
         # Device 모델에서 같은 device_name을 가진 최근의 데이터 찾기
         two_weeks_ago = timezone.now() - timezone.timedelta(weeks=2)
@@ -30,20 +29,41 @@ def save_device(request):
                 'timestamp': recent_device.timestamp
             }
             return JsonResponse(response_data)
+          
+        # 2주 넘은 시점에 저장된 db가 있다면 업데이트
+        older_device = Device.objects.filter(student_id=student_id, timestamp__lt=two_weeks_ago).first()
         
-        # Device 모델에 데이터 저장
+        if older_device:
+            older_device.device_name = device_name
+            older_device.device_serial = device_serial
+            older_device.timestamp = timezone.now()
+            older_device.save()
+            response_data = {
+                'status': 'success',
+                'message': '디바이스가 새로 등록되었습니다.',
+                'device_id': older_device.device_serial,
+                'device_name': older_device.device_name,
+                'timestamp': older_device.timestamp
+            }
+            return JsonResponse(response_data)
+        
+        # 둘 다 없다면 Device 모델에 데이터 저장
+
         device = Device.objects.create(
-            student_id=student_id,
             device_name=device_name,
-            device_serial=device_serial
+            device_serial=device_serial,
+            student_id=student_id,
+            timestamp = timezone.now()
         )
 
-        # 현재 저장된 Device 출력
-        devices = Device.objects.all().values()
-        device_list = list(devices)
-        print(device_list)
-
-        return JsonResponse({'status': 'success'})
+        response_data = {
+            'status': 'success',
+            'message': '디바이스가 새로 등록되었습니다.',
+            'device_id': device.device_serial,
+            'device_name': device.device_name,
+            'timestamp': device.timestamp
+        }
+        return JsonResponse(response_data)
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
 
@@ -70,3 +90,4 @@ def get_device(request):
         else: return JsonResponse({'status': 'error', 'message': '등록된 디바이스가 없습니다.'})
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
+
