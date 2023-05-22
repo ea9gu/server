@@ -29,7 +29,7 @@ def save_device(request):
                 'timestamp': recent_device.timestamp
             }
             return JsonResponse(response_data)
-
+          
         # 2주 넘은 시점에 저장된 db가 있다면 업데이트
         older_device = Device.objects.filter(student_id=student_id, timestamp__lt=two_weeks_ago).first()
         
@@ -48,6 +48,7 @@ def save_device(request):
             return JsonResponse(response_data)
         
         # 둘 다 없다면 Device 모델에 데이터 저장
+
         device = Device.objects.create(
             device_name=device_name,
             device_serial=device_serial,
@@ -89,3 +90,4 @@ def get_device(request):
         else: return JsonResponse({'status': 'error', 'message': '등록된 디바이스가 없습니다.'})
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
+
