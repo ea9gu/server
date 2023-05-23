@@ -159,6 +159,7 @@ def get_prof_course(request):
 def get_attendance_data(request):
     if request.method == 'POST':
         course_id = request.POST.get('course_id')
+        date = request.POST.get('date') 
     else: return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
     # 클래스 정보 가져오기
@@ -167,15 +168,30 @@ def get_attendance_data(request):
     # 학생들의 ID 가져오기
     student_ids = StudentCourse.objects.filter(course_id=course).values_list('student_id', flat=True)
 
-    # 출석 데이터 조회
-    attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids).order_by('date')
+    if date: 
+        attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids, date=date).order_by('student_id')
+        if not attendance_data.exists():
+            return JsonResponse({'error': 'Attendance data not found for the specified date.'}, status=404)
+    else: attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids).order_by('date')
 
     # 날짜별 및 학번별 출석 데이터 구성
     attendance_by_student_and_date = {}
+    if date:
+        
+        for attendance in attendance_data:
+            attendance_date = str(attendance.date)
+            student_id = str(attendance.student_id)
+            attendance_status = str(int(attendance.attend))
+            
+        if attendance_date not in attendance_by_student_and_date: attendance_by_student_and_date[attendance_date] = {}
+        
+        attendance_by_student_and_date[attendance_date][student_id] = attendance_status
 
-    for attendance in attendance_data:
-        if attendance.student_id not in attendance_by_student_and_date:
-            attendance_by_student_and_date[attendance.student_id] = {}
-        attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
+    else:
+        for attendance in attendance_data:
+            if attendance.student_id not in attendance_by_student_and_date:
+                attendance_by_student_and_date[attendance.student_id] = {}
+            attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
 
+        
     return JsonResponse(attendance_by_student_and_date)
