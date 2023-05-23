@@ -160,6 +160,7 @@ def get_attendance_data(request):
     if request.method == 'POST':
         course_id = request.POST.get('course_id')
         date = request.POST.get('date') 
+        student_id = request.POST.get('student_id')
     else: return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
     # 클래스 정보 가져오기
@@ -172,20 +173,29 @@ def get_attendance_data(request):
         attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids, date=date).order_by('student_id')
         if not attendance_data.exists():
             return JsonResponse({'error': 'Attendance data not found for the specified date.'}, status=404)
+    elif student_id: 
+        attendance_data = Attendance.objects.filter(course_id=course_id, student_id=student_id).order_by('date')
+        if not attendance_data.exists():
+            return JsonResponse({'error': 'Attendance data not found for the specified student_id.'}, status=404)
     else: attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids).order_by('date')
 
     # 날짜별 및 학번별 출석 데이터 구성
     attendance_by_student_and_date = {}
+
     if date:
-        
         for attendance in attendance_data:
             attendance_date = str(attendance.date)
             student_id = str(attendance.student_id)
             attendance_status = str(int(attendance.attend))
-            
         if attendance_date not in attendance_by_student_and_date: attendance_by_student_and_date[attendance_date] = {}
-        
         attendance_by_student_and_date[attendance_date][student_id] = attendance_status
+
+    elif student_id: 
+        for attendance in attendance_data:
+            attendance_date = str(attendance.date)
+            attendance_status = str(int(attendance.attend))
+        if attendance_date not in attendance_by_student_and_date: attendance_by_student_and_date[attendance_date] = {}
+        attendance_by_student_and_date[attendance_date] = attendance_status
 
     else:
         for attendance in attendance_data:
@@ -193,5 +203,4 @@ def get_attendance_data(request):
                 attendance_by_student_and_date[attendance.student_id] = {}
             attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
 
-        
     return JsonResponse(attendance_by_student_and_date)
