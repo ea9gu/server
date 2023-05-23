@@ -12,6 +12,8 @@ import json
 from datetime import datetime, timedelta
 from freq.models import AudioFile, Attendance
 
+from django.shortcuts import get_object_or_404
+
 @csrf_exempt
 def create_and_enroll(request):
     if request.method == 'POST':
@@ -127,3 +129,51 @@ def get_student_course(request):
             return JsonResponse({'error': 'student_id parameter is required.'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+def get_prof_course(request):
+    if request.method == 'GET':
+        professor_id = request.GET.get('professor_id')
+
+        if professor_id is not None:
+            courses = Course.objects.filter(professor_id=professor_id)
+            course_list = []
+
+            for course in courses:
+                course_info = {
+                    'class_id': course.course_id,
+                    'name': course.name
+                }
+                course_list.append(course_info)
+
+            return JsonResponse({'courses': course_list})
+        else:
+            return JsonResponse({'error': 'professor_id parameter is required.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+def get_attendance_data(request):
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+    # class_id에 해당하는 클래스의 출석 데이터를 날짜별 및 학번별로 구성된 2차원 리스트로 반환하는 함수
+
+    course = get_object_or_404(Course, course_id=course_id)
+    student_ids = StudentCourse.objects.filter(course_id=course).values_list('student_id', flat=True)
+    attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids).order_by('date')
+
+    # 날짜별 및 학번별 출석 데이터 구성
+    dates = sorted(set(attendance.date for attendance in attendance_data))
+    attendance_by_student = {student_id: {} for student_id in student_ids}
+
+    for attendance in attendance_data:
+        attendance_by_student[attendance.student_id][attendance.date] = attendance.attend
+
+    # 2차원 리스트 형태로 데이터 반환
+    attendance_table = [[None] + dates]
+
+    for student_id, attendance_by_date in attendance_by_student.items():
+        row = [student_id] + [attendance_by_date.get(date, False) for date in dates]
+        attendance_table.append(row)
+
+    return attendance_table
