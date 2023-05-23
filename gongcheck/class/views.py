@@ -129,7 +129,7 @@ def get_student_course(request):
             return JsonResponse({'error': 'student_id parameter is required.'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=405)
-
+    
 @csrf_exempt
 def get_prof_course(request):
     if request.method == 'GET':
