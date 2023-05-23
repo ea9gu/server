@@ -107,7 +107,7 @@ def send_signal_to_flutter(request):
 
     return JsonResponse({'status': 'error'})
 
-
+### 학생의 과목 출력
 @csrf_exempt
 def get_student_course(request):
     if request.method == 'GET':
@@ -119,7 +119,7 @@ def get_student_course(request):
 
             for course in courses:
                 course_info = {
-                    'class_id': course.course_id.course_id,
+                    'course_id': course.course_id.course_id,
                     'name': course.course_id.name
                 }
                 course_list.append(course_info)
@@ -130,6 +130,7 @@ def get_student_course(request):
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=405)
     
+### 교수의 과목 출력
 @csrf_exempt
 def get_prof_course(request):
     if request.method == 'GET':
@@ -141,7 +142,7 @@ def get_prof_course(request):
 
             for course in courses:
                 course_info = {
-                    'class_id': course.course_id,
+                    'course_id': course.course_id,
                     'name': course.name
                 }
                 course_list.append(course_info)
@@ -152,28 +153,29 @@ def get_prof_course(request):
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
+
+######## 출석부 출력 코드
 @csrf_exempt
 def get_attendance_data(request):
     if request.method == 'POST':
         course_id = request.POST.get('course_id')
-    # class_id에 해당하는 클래스의 출석 데이터를 날짜별 및 학번별로 구성된 2차원 리스트로 반환하는 함수
+    else: return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
+    # 클래스 정보 가져오기
     course = get_object_or_404(Course, course_id=course_id)
+
+    # 학생들의 ID 가져오기
     student_ids = StudentCourse.objects.filter(course_id=course).values_list('student_id', flat=True)
+
+    # 출석 데이터 조회
     attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids).order_by('date')
 
     # 날짜별 및 학번별 출석 데이터 구성
-    dates = sorted(set(attendance.date for attendance in attendance_data))
-    attendance_by_student = {student_id: {} for student_id in student_ids}
+    attendance_by_student_and_date = {}
 
     for attendance in attendance_data:
-        attendance_by_student[attendance.student_id][attendance.date] = attendance.attend
+        if attendance.student_id not in attendance_by_student_and_date:
+            attendance_by_student_and_date[attendance.student_id] = {}
+        attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
 
-    # 2차원 리스트 형태로 데이터 반환
-    attendance_table = [[None] + dates]
-
-    for student_id, attendance_by_date in attendance_by_student.items():
-        row = [student_id] + [attendance_by_date.get(date, False) for date in dates]
-        attendance_table.append(row)
-
-    return attendance_table
+    return JsonResponse(attendance_by_student_and_date)

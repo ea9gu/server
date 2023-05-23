@@ -10,5 +10,5 @@ urlpatterns = [
     path('activate-signal/', views.send_signal_to_flutter, name='send_signal_to_flutter'),
     path('student-course/', views.get_student_course, name='get_student_course'),
     path('prof-course/', views.get_prof_course, name='get_prof_course'),
-    # path('get-att-data/', views.get_attendance_data, name='get_attendance_data'),
+    path('get-attendance-data/', views.get_attendance_data, name='get_attendance_data'),
 ]
