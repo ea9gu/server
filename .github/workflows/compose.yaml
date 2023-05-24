@@ -20,7 +20,8 @@ jobs:
 
     - name: Build and run Docker Compose
       run: |
-        gongcheck/docker-compose up -d
+        cd gongcheck
+        docker-compose up -d
 
     - name: Display container logs after completion (optional)
       run: |
