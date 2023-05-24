@@ -78,6 +78,15 @@ Records: 4  Duplicates: 0  Warnings: 0
 
 ---
 
+### app name 바꾸었을 때 table 이름 변경 처리
+
+```mysql
+mysql> alter table class_course rename to classfile_course;
+mysql> alter table class_studentcourse rename to classfile_studentcourse;
+```
+
+---
+
 ```shell
 +--------------------------------+
 | Tables_in_test                 |
