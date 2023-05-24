@@ -12,6 +12,8 @@ import json
 from datetime import datetime, timedelta
 from freq.models import AudioFile, Attendance
 
+from django.shortcuts import get_object_or_404
+
 @csrf_exempt
 def create_and_enroll(request):
     if request.method == 'POST':
@@ -105,7 +107,7 @@ def send_signal_to_flutter(request):
 
     return JsonResponse({'status': 'error'})
 
-
+### 학생의 과목 출력
 @csrf_exempt
 def get_student_course(request):
     if request.method == 'GET':
@@ -117,7 +119,7 @@ def get_student_course(request):
 
             for course in courses:
                 course_info = {
-                    'class_id': course.course_id.course_id,
+                    'course_id': course.course_id.course_id,
                     'name': course.course_id.name
                 }
                 course_list.append(course_info)
@@ -125,5 +127,110 @@ def get_student_course(request):
             return JsonResponse({'courses': course_list})
         else:
             return JsonResponse({'error': 'student_id parameter is required.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+    
+### 교수의 과목 출력
+@csrf_exempt
+def get_prof_course(request):
+    if request.method == 'GET':
+        professor_id = request.GET.get('professor_id')
+
+        if professor_id is not None:
+            courses = Course.objects.filter(professor_id=professor_id)
+            course_list = []
+
+            for course in courses:
+                course_info = {
+                    'course_id': course.course_id,
+                    'name': course.name
+                }
+                course_list.append(course_info)
+
+            return JsonResponse({'courses': course_list})
+        else:
+            return JsonResponse({'error': 'professor_id parameter is required.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+######## 출석부 출력 코드
+@csrf_exempt
+def get_attendance_data(request):
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        date = request.POST.get('date') 
+        student_id = request.POST.get('student_id')
+    else: return JsonResponse({'error': 'Invalid request method.'})
+
+    # 클래스 정보 가져오기
+    course = get_object_or_404(Course, course_id=course_id)
+
+    # 학생들의 ID 가져오기
+    student_ids = StudentCourse.objects.filter(course_id=course).values_list('student_id', flat=True)
+
+    if date and student_id: 
+        attendance_data = Attendance.objects.filter(course_id=course_id, student_id=student_id, date=date).order_by('date')
+        if not attendance_data.exists():
+            return JsonResponse({'error': 'Attendance data not found for the specified student_id with date.'})
+    elif date: 
+        attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids, date=date).order_by('student_id')
+        if not attendance_data.exists(): return JsonResponse({'error': 'Attendance data not found for the specified date.'})
+    elif student_id:
+        attendance_data = Attendance.objects.filter(course_id=course_id, student_id=student_id).order_by('date')
+        if not attendance_data.exists():
+            return JsonResponse({'error': 'Attendance data not found for the specified student_id.'})
+    else: attendance_data = Attendance.objects.filter(course_id=course_id, student_id__in=student_ids).order_by('date')
+
+    # 날짜별 및 학번별 출석 데이터 구성
+    attendance_by_student_and_date = {}
+
+    if date and student_id: 
+        for attendance in attendance_data:
+            if attendance.student_id not in attendance_by_student_and_date:
+                attendance_by_student_and_date[str(attendance.date)] = {}
+            attendance_by_student_and_date[str(attendance.date)] = int(attendance.attend)
+
+    elif date:
+        for attendance in attendance_data:
+            if attendance.student_id not in attendance_by_student_and_date:
+                attendance_by_student_and_date[attendance.student_id] = {}
+            attendance_by_student_and_date[attendance.student_id] = int(attendance.attend)
+
+    elif student_id: 
+        for attendance in attendance_data:
+            if attendance.student_id not in attendance_by_student_and_date:
+                attendance_by_student_and_date[str(attendance.date)] = {}
+            attendance_by_student_and_date[str(attendance.date)] = int(attendance.attend)
+            # if attendance.student_id == student_id:
+            #     attendance_by_student_and_date[attendance.student_id] = {str(attendance.date): int(attendance.attend)}
+        
+    else:
+        for attendance in attendance_data:
+            if attendance.student_id not in attendance_by_student_and_date:
+                attendance_by_student_and_date[attendance.student_id] = {}
+            attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
+
+
+    return JsonResponse(attendance_by_student_and_date)
+
+@csrf_exempt
+def fix_attendance(request):
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        date = request.POST.get('date')
+        student_id = request.POST.get('student_id')
+        bef_att = request.POST.get('bef_att')
+        aft_att = request.POST.get('aft_att')
+
+        try:
+            attendance = Attendance.objects.get(course_id=course_id, date=date, student_id=student_id, attend=(bef_att == 'True'))
+            attendance.attend = (aft_att == 'True')
+            attendance.save()
+            return JsonResponse({'success': 'Attendance fixed successfully.'})
+
+        except Attendance.DoesNotExist:
+            return JsonResponse({'error': 'Attendance data not found.'})
+
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=405)
