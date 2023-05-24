@@ -3,7 +3,7 @@ name: Docker Compose
 on:
   push:
     branches:
-      - actions  # or your default branch
+      - main  # or your default branch
 
 jobs:
   build:
