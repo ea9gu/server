@@ -214,22 +214,23 @@ def get_attendance_data(request):
 
     return JsonResponse(attendance_by_student_and_date)
 
-# @csrf_exempt
-# def fix_attendance(request):
-#     if request.method == 'POST':
-#         course_id = request.POST.get('course_id')
-#         date = request.POST.get('date') 
-#         student_id = request.POST.get('student_id')
-#         bef_att = request.POST.get('bef_att')
-#         aft_att = request.POST.get('aft_att')
+@csrf_exempt
+def fix_attendance(request):
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id')
+        date = request.POST.get('date')
+        student_id = request.POST.get('student_id')
+        bef_att = request.POST.get('bef_att')
+        aft_att = request.POST.get('aft_att')
 
-#         try:
-#             attendance = Attendance.objects.get(course_id=course_id, date=date, student_id=student_id, attend=bef_att)
-#             attendance.attend = aft_att
-#             attendance.save()
-#             return JsonResponse({'success': 'Attendance fixed successfully.'})
-        
-#         except Attendance.DoesNotExist:
-#             return JsonResponse({'error': 'Attendance data not found.'}, status=404)
-#     else:
-#         return JsonResponse({'error': 'Invalid request method.'}, status=405)
+        try:
+            attendance = Attendance.objects.get(course_id=course_id, date=date, student_id=student_id, attend=(bef_att == 'True'))
+            attendance.attend = (aft_att == 'True')
+            attendance.save()
+            return JsonResponse({'success': 'Attendance fixed successfully.'})
+
+        except Attendance.DoesNotExist:
+            return JsonResponse({'error': 'Attendance data not found.'})
+
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)

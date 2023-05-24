@@ -11,5 +11,5 @@ urlpatterns = [
     path('student-course/', views.get_student_course, name='get_student_course'),
     path('prof-course/', views.get_prof_course, name='get_prof_course'),
     path('get-attendance-data/', views.get_attendance_data, name='get_attendance_data'),
-    # path('fix-attendance/', views.fix_attendance, name='fix_attendance'),
+    path('fix-attendance/', views.fix_attendance, name='fix_attendance'),
 ]
