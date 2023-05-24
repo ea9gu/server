@@ -3,7 +3,7 @@ name: Docker Compose
 on:
   push:
     branches:
-      - action
+      - actions
 
 jobs:
   build:
