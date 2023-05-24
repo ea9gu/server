@@ -19,10 +19,11 @@ jobs:
         sudo apt-get install -y docker-compose
 
     - name: Build and run Docker Compose
+      working-directory: ./gongcheck
       run: |
-        cd gongcheck
         docker-compose up -d
 
     - name: Display container logs after completion (optional)
+      working-directory: ./gongcheck
       run: |
         docker-compose logs
