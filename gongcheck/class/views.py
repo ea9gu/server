@@ -184,11 +184,16 @@ def get_attendance_data(request):
 
     if date:
         for attendance in attendance_data:
-            attendance_date = str(attendance.date)
-            student_id = str(attendance.student_id)
-            attendance_status = str(int(attendance.attend))
-        if attendance_date not in attendance_by_student_and_date: attendance_by_student_and_date[attendance_date] = {}
-        attendance_by_student_and_date[attendance_date][student_id] = attendance_status
+            if attendance.student_id not in attendance_by_student_and_date:
+                attendance_by_student_and_date[attendance.student_id] = {}
+            attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
+
+        # for attendance in attendance_data:
+        #     attendance_date = str(attendance.date)
+        #     student_id = str(attendance.student_id)
+        #     attendance_status = str(int(attendance.attend))
+        # if attendance_date not in attendance_by_student_and_date: attendance_by_student_and_date[attendance_date] = {}
+        # attendance_by_student_and_date[attendance_date][student_id] = attendance_status
 
     elif student_id: 
         for attendance in attendance_data:
@@ -204,3 +209,23 @@ def get_attendance_data(request):
             attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
 
     return JsonResponse(attendance_by_student_and_date)
+
+# @csrf_exempt
+# def fix_attendance(request):
+#     if request.method == 'POST':
+#         course_id = request.POST.get('course_id')
+#         date = request.POST.get('date') 
+#         student_id = request.POST.get('student_id')
+#         bef_att = request.POST.get('bef_att')
+#         aft_att = request.POST.get('aft_att')
+
+#         try:
+#             attendance = Attendance.objects.get(course_id=course_id, date=date, student_id=student_id, attend=bef_att)
+#             attendance.attend = aft_att
+#             attendance.save()
+#             return JsonResponse({'success': 'Attendance fixed successfully.'})
+        
+#         except Attendance.DoesNotExist:
+#             return JsonResponse({'error': 'Attendance data not found.'}, status=404)
+#     else:
+#         return JsonResponse({'error': 'Invalid request method.'}, status=405)
