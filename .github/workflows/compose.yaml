@@ -1,0 +1,37 @@
+name: Docker Compose
+
+on:
+  push:
+    branches:
+      - actions  # or your default branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DB_DATABASE: ${{ secrets.DB_DATABASE }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Build and run Docker Compose
+      working-directory: ./gongcheck
+      run: |
+        docker-compose up -d
+
+    - name: Display container logs after completion (optional)
+      working-directory: ./gongcheck
+      run: |
+        docker-compose logs
