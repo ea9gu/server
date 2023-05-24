@@ -211,8 +211,15 @@ def get_attendance_data(request):
                 attendance_by_student_and_date[attendance.student_id] = {}
             attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
 
+    response_data = {
+        'course_id': course_id,
+        'attendance_data': attendance_by_student_and_date,
+        'dates': sorted(list(set([str(a.date) for a in attendance_data]))),
+    }
 
-    return JsonResponse(attendance_by_student_and_date)
+    return JsonResponse(response_data)
+
+    # return JsonResponse(attendance_by_student_and_date)
 
 @csrf_exempt
 def fix_attendance(request):
