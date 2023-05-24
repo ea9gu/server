@@ -188,7 +188,7 @@ def get_attendance_data(request):
                 attendance_by_student_and_date[attendance.student_id] = {}
             attendance_by_student_and_date[attendance.student_id] = int(attendance.attend)
 
-    if student_id: 
+    elif student_id: 
         for attendance in attendance_data:
             if attendance.student_id not in attendance_by_student_and_date:
                 attendance_by_student_and_date[str(attendance.date)] = {}
