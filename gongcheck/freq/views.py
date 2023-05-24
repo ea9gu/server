@@ -4,6 +4,7 @@ from django.shortcuts import render
 # 1) def get api(request) : GET요청이 들어오면 Post모델 데이터를 직렬화하여 JSON/XML로 응답하는 함수입니다. 
 # 2) def post_api(request) : POST요청이 들어오면 요청 데이터를 Serializer를 사용해 객체화하여 DB에 담는 함수입니다. 
 from .models import AudioFile, Attendance
+from classfile.models import StudentCourse, Course
 
 from django.http import HttpResponse, JsonResponse
 from pydub import AudioSegment
@@ -11,15 +12,19 @@ import numpy as np
 import os
 import json
 from scipy.io.wavfile import read
+import datetime
 
 from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def generate_freq(request):
     frequency = int(request.GET.get('frequency', 20000))  # 기본 주파수는 18kHz로 설정
-    course_id = int(request.GET.get('course_id', 0))
+    course_id = request.GET.get('course_id')
     number = int(request.GET.get('number', 0))
     activation_duration = int(request.GET.get('activation_duration', 5))
+
+    if course_id is None:
+        return JsonResponse({'error': 'course_id parameter is missing.'}, status=400)
 
     # 주파수에 해당하는 음성 생성
     duration = 5000  # 음성의 길이 (5초)
@@ -49,6 +54,21 @@ def generate_freq(request):
         number=number,
         activation_duration=activation_duration,
     )
+
+    course = Course.objects.get(course_id=course_id)
+    student_ids = StudentCourse.objects.filter(course_id=course).values_list('student_id', flat=True)
+
+
+    # 모든 학생들의 데이터 추가
+    date = datetime.date.today()
+    for student_id in student_ids:
+        Attendance.objects.create(
+            student_id=student_id,
+            course_id=course_id,
+            date=date,
+            attend=False,
+            course_number=number,
+        )
 
     return JsonResponse({'course_id': course_id, 'file_url': audio_file.get_file_url()})
     # return JsonResponse({'file_url': file_path})

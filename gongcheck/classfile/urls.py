@@ -1,7 +1,7 @@
 from django.urls import path, include
 from . import views
 
-app_name = 'class'
+app_name = 'classfile'
 
 urlpatterns = [
     # path('create-course/', views.create_course, name='create_course'),
