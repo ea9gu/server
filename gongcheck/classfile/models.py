@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class Course(models.Model):
     # 과목 정보
-    course_id = models.CharField(max_length=10, unique=True)
+    course_id = models.CharField(max_length=100, unique=False)
     name = models.CharField(max_length=100)
     professor_id = models.CharField(max_length=10) # 교수의 ID를 저장
 

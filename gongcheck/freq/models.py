@@ -5,7 +5,7 @@ class AudioFile(models.Model):
     frequency = models.IntegerField()
     file_path = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    course_id = models.IntegerField()
+    course_id = models.CharField(max_length=100, unique=False)
     number = models.IntegerField()
     activation_duration = models.IntegerField()
     def get_file_url(self):
@@ -15,7 +15,7 @@ class Attendance(models.Model):
     # 학생의 녹음 음성 파일 정보
     attendance_id = models.AutoField(primary_key=True)
     student_id = models.CharField(max_length=100)
-    course_id = models.CharField(max_length=100)
+    course_id = models.CharField(max_length=100, unique=False)
     date = models.DateField()
     attend = models.BooleanField()
     course_number = models.IntegerField()

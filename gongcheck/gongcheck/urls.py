@@ -23,5 +23,5 @@ urlpatterns = [
     path('user/account/', include('accounts.urls')),
     path('freq/', include('freq.urls')),
     path('serial/', include('serial.urls')),
-    path('class/', include('class.urls')),
+    path('class/', include('classfile.urls')),
 ]

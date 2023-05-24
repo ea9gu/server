@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'accounts',
     'freq',
     'serial',
-    'class',
+    'classfile',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'dj_rest_auth',

@@ -211,8 +211,23 @@ def get_attendance_data(request):
                 attendance_by_student_and_date[attendance.student_id] = {}
             attendance_by_student_and_date[attendance.student_id][str(attendance.date)] = int(attendance.attend)
 
+    try:
+        student_names = User.objects.filter(username__in=student_ids).values('username', 'name')
+        student_names_dict = {student['username']: student['name'] for student in student_names}
+        if student_id: student_names_dict = student_names_dict.get(student_id, '')
+    except: 
+        student_names_dict = {}
 
-    return JsonResponse(attendance_by_student_and_date)
+    response_data = {
+        'course_id': course_id,
+        'student_names': student_names_dict,
+        'attendance_data': attendance_by_student_and_date,
+        'dates': sorted(list(set([str(a.date) for a in attendance_data]))),
+    }
+
+    return JsonResponse(response_data)
+
+    # return JsonResponse(attendance_by_student_and_date)
 
 @csrf_exempt
 def fix_attendance(request):
