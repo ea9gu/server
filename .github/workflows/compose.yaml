@@ -3,7 +3,7 @@ name: Docker Compose
 on:
   push:
     branches:
-      - actions
+      - main
 
 jobs:
   build:
@@ -38,6 +38,7 @@ jobs:
       run: |
         docker tag gongcheck:latest "${{ secrets.DOCKERHUB_ID }}/gongcheck:latest"
         docker push "${{ secrets.DOCKERHUB_ID }}/gongcheck:latest"
+
 
     - name: Docker Compose
       run: |
