@@ -109,9 +109,9 @@ def save_attendance(request):
         # 프론트에서 전달된 데이터 받기
         # try: data = json.loads(request.body.decode('utf-8'))
         # except UnicodeDecodeError: return JsonResponse({'status': 'error', 'message': '올바른 인코딩 형식이 아닙니다.'})
-        student_id = data.POST.get('student_id')
-        course_id = data.POST.get('course_id')
-        date = data.POST.get('date')
+        student_id = request.POST.get('student_id')
+        course_id = request.POST.get('course_id')
+        date = request.POST.get('date')
         # attend = 0 # 기본값은 미출석 처리
         audio_file = request.FILES.get('recording')
 
