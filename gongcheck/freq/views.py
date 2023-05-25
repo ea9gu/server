@@ -33,6 +33,7 @@ def generate_freq(request):
     audio_data = np.sin(2 * np.pi * frequency * t)
     audio_data = (audio_data * 32767).astype(np.int16)
 
+    current_date = timezone.now().date()  # 현재 날짜 가져오기
     existing_audio = AudioFile.objects.filter(course_id=course_id, created_at__date=current_date).first()
     if existing_audio:
         return JsonResponse({'error': 'An audio file with the same date and course ID already exists.'})
