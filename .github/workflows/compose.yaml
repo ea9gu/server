@@ -31,15 +31,14 @@ jobs:
         docker build -t gongcheck ./gongcheck
     
     - name: DockerHub Login
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PW }}
+      run: |
+        echo "${{ secrets.DOCKERHUB_PW }}" | docker login --username "${{ secrets.DOCKERHUB_ID }}" --password-stdin
 
     - name: Push to Docker Hub
       run: |
-        docker tag my-app:latest "${{ secrets.DOCKERHUB_USERNAME }}/gongcheck:latest"
-        docker push "${{ secrets.DOCKERHUB_USERNAME }}/gongcheck:latest"
+        docker tag gongcheck:latest "${{ secrets.DOCKERHUB_ID }}/gongcheck:latest"
+        docker push "${{ secrets.DOCKERHUB_ID }}/gongcheck:latest"
+
 
     - name: Docker Compose
       run: |
