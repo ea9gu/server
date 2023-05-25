@@ -9,6 +9,7 @@ import csv
 from io import StringIO
 import json
 
+from django.utils import timezone
 from datetime import datetime, timedelta
 from freq.models import AudioFile, Attendance
 
@@ -81,7 +82,7 @@ def send_signal_to_flutter(request):
             return JsonResponse({'status': 'error'})
 
         # Get the current datetime
-        current_datetime = datetime.now()
+        current_datetime = timezone.now()
         activation_duration = timedelta(minutes=5)  # Default activation duration if not found in the database
 
         try:
@@ -93,6 +94,7 @@ def send_signal_to_flutter(request):
         # Calculate the datetime threshold (activation_duration minutes ago)
         threshold_datetime = current_datetime - activation_duration
 
+        print(threshold_datetime)
         try:
             latest_audio_file = AudioFile.objects.filter(course_id=course_id, created_at__gte=threshold_datetime).latest('created_at')
 
