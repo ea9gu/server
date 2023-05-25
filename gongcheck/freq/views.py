@@ -33,6 +33,10 @@ def generate_freq(request):
     audio_data = np.sin(2 * np.pi * frequency * t)
     audio_data = (audio_data * 32767).astype(np.int16)
 
+    # existing_audio = AudioFile.objects.filter(course_id=course_id, date=date).first()
+    # if existing_audio:
+    #    return JsonResponse({'error': 'An audio file with the same date and course ID already exists.'})
+
     # 음성 데이터를 WAV 형식으로 변환
     audio = AudioSegment(
         audio_data.tobytes(),
@@ -115,15 +119,16 @@ def save_attendance(request):
         # attend = 0 # 기본값은 미출석 처리
         audio_file = request.FILES.get('recording')
 
-        latest_attendance = Attendance.objects.filter(course_id=course_id).order_by('-course_number').first()
-        if latest_attendance: course_number = latest_attendance.course_number + 1
-        else: course_number = 1
+        # latest_attendance = Attendance.objects.filter(course_id=course_id).order_by('-course_number').first()
+        # if latest_attendance: course_number = latest_attendance.course_number + 1
+        # else: course_number = 1
 
-        try:
-            Attendance.objects.filter(student_id=student_id, course_id=course_id, date=date, attend=0).update(attend=1)
-            return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
-        except:
-            return JsonResponse({'status': 'error', 'message': '주파수 값과 일치하는 오디오 파일이 없습니다.'})
+    try:
+        Attendance.objects.filter(student_id=student_id, course_id=course_id, date=date, attend=False).update(attend=True)
+        return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': '오류가 발생했습니다.'})
         # return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
