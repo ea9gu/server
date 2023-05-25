@@ -12,7 +12,7 @@ import numpy as np
 import os
 import json
 from scipy.io.wavfile import read
-import datetime
+from datetime import datetime, timedelta
 
 from django.views.decorators.csrf import csrf_exempt
 
@@ -73,35 +73,6 @@ def generate_freq(request):
     return JsonResponse({'course_id': course_id, 'file_url': audio_file.get_file_url()})
     # return JsonResponse({'file_url': file_path})
     
-# @csrf_exempt
-# def save_attendance(request):
-#     if request.method == 'POST':
-#         # 프론트에서 전달된 데이터 받기
-#         try: data = json.loads(request.body.decode('utf-8'))
-#         except UnicodeDecodeError: return JsonResponse({'status': 'error', 'message': '올바른 인코딩 형식이 아닙니다.'})
-
-#         student_id = data.get('student_id')
-#         course_id = data.get('course_id')
-#         date = data.get('date')
-#         attend = 0 # 기본값은 미출석 처리
-#         # # Attendance 모델에 데이터 저장
-#         # attendance = Attendance.objects.create(
-#         #     student_id=student_id,
-#         #     course_id=course_id,
-#         #     date=date,
-#         #     attend=attend,
-#         #     course_number=course_number
-#         # )
-
-#         # if audio_file:
-#         if True:
-#             Attendance.objects.filter(student_id=student_id, course_id=course_id, attend=0).update(attend=1)
-#             return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
-
-#         return JsonResponse({'status': 'success'})
-
-#     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
-
 
 @csrf_exempt
 def save_attendance(request):
@@ -120,15 +91,26 @@ def save_attendance(request):
         if latest_attendance: course_number = latest_attendance.course_number + 1
         else: course_number = 1
 
-        # # Attendance 모델에 데이터 저장
-        # attendance = Attendance.objects.create(
-        #     student_id=student_id,
-        #     course_id=course_id,
-        #     date=date,
-        #     attend=attend,
-        #     course_number=course_number
-        # )
+        current_datetime = datetime.now()
+        activation_duration = timedelta(minutes=5)  # Default activation duration if not found in the database
 
+        try:
+            audio_file = AudioFile.objects.filter(course_id=course_id).latest('created_at')
+            activation_duration = timedelta(minutes=audio_file.activation_duration)
+        except AudioFile.DoesNotExist:
+            return JsonResponse({'status': 'error'})
+
+        # Calculate the datetime threshold (activation_duration minutes ago)
+        threshold_datetime = current_datetime - activation_duration
+        
+        try:
+            latest_audio_file = AudioFile.objects.filter(course_id=course_id, created_at__gte=threshold_datetime).latest('created_at')
+
+            # Check if the latest audio file is within the activation_duration timeframe
+            if latest_audio_file.created_at >= threshold_datetime: pass
+            else: return JsonResponse({'status': 'error'})
+        except: return JsonResponse({'status': 'error'})
+        
         if audio_file:
             # 음성 녹음 파일을 저장하고 파일 경로를 얻습니다.
             file_name = 'record.wav'
