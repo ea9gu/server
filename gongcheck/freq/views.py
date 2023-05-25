@@ -34,8 +34,11 @@ def generate_freq(request):
     audio_data = np.sin(2 * np.pi * frequency * t)
     audio_data = (audio_data * 32767).astype(np.int16)
 
-    current_date = timezone.now().date()  # 현재 날짜 가져오기
-    existing_audio = AudioFile.objects.filter(course_id=course_id, created_at__date=current_date).first()
+    current_date = datetime.datetime.now()  # 현재 날짜와 시간 가져오기
+    timezone_offset = datetime.timedelta(hours=9)  # +9 시간을 나타내는 timedelta 생성
+    new_date = current_date + timezone_offset  # 현재 날짜에 timedelta를 더하여 새로운 날짜 계산
+    new_date = new_date.date()  # 시간을 제외하고 날짜만 가져오기
+    existing_audio = AudioFile.objects.filter(course_id=course_id, created_at__date=new_date).first()
     if existing_audio:
         return JsonResponse({'error': 'An audio file with the same date and course ID already exists.'})
 
@@ -124,7 +127,9 @@ def save_attendance(request):
         # latest_attendance = Attendance.objects.filter(course_id=course_id).order_by('-course_number').first()
         # if latest_attendance: course_number = latest_attendance.course_number + 1
         # else: course_number = 1
-
+    print(date)
+    print(student_id)
+    print(course_id)
     try:
         Attendance.objects.filter(student_id=student_id, course_id=course_id, date=date, attend=False).update(attend=True)
         return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
