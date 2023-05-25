@@ -33,9 +33,9 @@ def generate_freq(request):
     audio_data = np.sin(2 * np.pi * frequency * t)
     audio_data = (audio_data * 32767).astype(np.int16)
 
-    # existing_audio = AudioFile.objects.filter(course_id=course_id, date=date).first()
-    # if existing_audio:
-    #    return JsonResponse({'error': 'An audio file with the same date and course ID already exists.'})
+    existing_audio = AudioFile.objects.filter(course_id=course_id, created_at__date=current_date).first()
+    if existing_audio:
+        return JsonResponse({'error': 'An audio file with the same date and course ID already exists.'})
 
     # 음성 데이터를 WAV 형식으로 변환
     audio = AudioSegment(
