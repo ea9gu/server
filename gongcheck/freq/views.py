@@ -113,45 +113,18 @@ def save_attendance(request):
         student_id = data.get('student_id')
         course_id = data.get('course_id')
         date = data.get('date')
-        attend = 0 # 기본값은 미출석 처리
+        # attend = 0 # 기본값은 미출석 처리
         audio_file = request.FILES.get('recording')
 
         latest_attendance = Attendance.objects.filter(course_id=course_id).order_by('-course_number').first()
         if latest_attendance: course_number = latest_attendance.course_number + 1
         else: course_number = 1
 
-        # # Attendance 모델에 데이터 저장
-        # attendance = Attendance.objects.create(
-        #     student_id=student_id,
-        #     course_id=course_id,
-        #     date=date,
-        #     attend=attend,
-        #     course_number=course_number
-        # )
-
-        if audio_file:
-            # 음성 녹음 파일을 저장하고 파일 경로를 얻습니다.
-            file_name = 'record.wav'
-            recording_path = os.path.join(os.getcwd(), file_name)
-            with open(recording_path, 'wb+') as destination:
-                for chunk in audio_file.chunks():
-                    destination.write(chunk)
-
-            # 주파수 분석을 수행합니다.
-            sample_rate, data = read(recording_path)
-            # data를 활용하여 주파수 분석 및 처리를 수행합니다.
-
-            # 주파수 값과 일치하는 AudioFile을 찾습니다.
-            try:
-                audio = AudioFile.objects.get(frequency=data)
-                # attendance.attend = 1  # 출석 처리
-                # attendance.save()
-                # Update the attend field of specific records in the database
-                Attendance.objects.filter(student_id=student_id, course_id=course_id, attend=0).update(attend=1)
-                return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
-            except AudioFile.DoesNotExist:
-                return JsonResponse({'status': 'error', 'message': '주파수 값과 일치하는 오디오 파일이 없습니다.'})
-
-        return JsonResponse({'status': 'success'})
+        try:
+            Attendance.objects.filter(student_id=student_id, course_id=course_id, date=date, attend=0).update(attend=1)
+            return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
+        except:
+            return JsonResponse({'status': 'error', 'message': '주파수 값과 일치하는 오디오 파일이 없습니다.'})
+        # return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
