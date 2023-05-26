@@ -38,6 +38,7 @@ def generate_freq(request):
     timezone_offset = datetime.timedelta(hours=9)  # +9 시간을 나타내는 timedelta 생성
     new_date = current_date + timezone_offset  # 현재 날짜에 timedelta를 더하여 새로운 날짜 계산
     new_date = new_date.date()  # 시간을 제외하고 날짜만 가져오기
+    # print(new_date)
     existing_audio = AudioFile.objects.filter(course_id=course_id, created_at__date=new_date).first()
     if existing_audio:
         return JsonResponse({'error': 'An audio file with the same date and course ID already exists.'})
