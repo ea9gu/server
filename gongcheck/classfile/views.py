@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from freq.models import AudioFile, Attendance
 
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 @csrf_exempt
 def create_and_enroll(request):
@@ -81,7 +82,7 @@ def send_signal_to_flutter(request):
             return JsonResponse({'status': 'error'})
 
         # Get the current datetime
-        current_datetime = datetime.now()
+        current_datetime = timezone.now()
         activation_duration = timedelta(minutes=5)  # Default activation duration if not found in the database
 
         try:

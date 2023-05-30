@@ -15,6 +15,7 @@ from scipy.io.wavfile import read
 import datetime
 
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 @csrf_exempt
 def generate_freq(request):
@@ -32,6 +33,15 @@ def generate_freq(request):
     t = np.linspace(0, duration, int(sample_rate * duration / 1000), False)
     audio_data = np.sin(2 * np.pi * frequency * t)
     audio_data = (audio_data * 32767).astype(np.int16)
+
+    current_date = datetime.datetime.now()  # 현재 날짜와 시간 가져오기
+    timezone_offset = datetime.timedelta(hours=9)  # +9 시간을 나타내는 timedelta 생성
+    new_date = current_date + timezone_offset  # 현재 날짜에 timedelta를 더하여 새로운 날짜 계산
+    new_date = new_date.date()  # 시간을 제외하고 날짜만 가져오기
+    # print(new_date)
+    existing_audio = AudioFile.objects.filter(course_id=course_id, created_at__date=new_date).first()
+    if existing_audio:
+        return JsonResponse({'error': 'An audio file with the same date and course ID already exists.'})
 
     # 음성 데이터를 WAV 형식으로 변환
     audio = AudioSegment(
@@ -107,51 +117,26 @@ def generate_freq(request):
 def save_attendance(request):
     if request.method == 'POST':
         # 프론트에서 전달된 데이터 받기
-        try: data = json.loads(request.body.decode('utf-8'))
-        except UnicodeDecodeError: return JsonResponse({'status': 'error', 'message': '올바른 인코딩 형식이 아닙니다.'})
-
-        student_id = data.get('student_id')
-        course_id = data.get('course_id')
-        date = data.get('date')
-        attend = 0 # 기본값은 미출석 처리
+        # try: data = json.loads(request.body.decode('utf-8'))
+        # except UnicodeDecodeError: return JsonResponse({'status': 'error', 'message': '올바른 인코딩 형식이 아닙니다.'})
+        student_id = request.POST.get('student_id')
+        course_id = request.POST.get('course_id')
+        date = request.POST.get('date')
+        # attend = 0 # 기본값은 미출석 처리
         audio_file = request.FILES.get('recording')
 
-        latest_attendance = Attendance.objects.filter(course_id=course_id).order_by('-course_number').first()
-        if latest_attendance: course_number = latest_attendance.course_number + 1
-        else: course_number = 1
-
-        # # Attendance 모델에 데이터 저장
-        # attendance = Attendance.objects.create(
-        #     student_id=student_id,
-        #     course_id=course_id,
-        #     date=date,
-        #     attend=attend,
-        #     course_number=course_number
-        # )
-
-        if audio_file:
-            # 음성 녹음 파일을 저장하고 파일 경로를 얻습니다.
-            file_name = 'record.wav'
-            recording_path = os.path.join(os.getcwd(), file_name)
-            with open(recording_path, 'wb+') as destination:
-                for chunk in audio_file.chunks():
-                    destination.write(chunk)
-
-            # 주파수 분석을 수행합니다.
-            sample_rate, data = read(recording_path)
-            # data를 활용하여 주파수 분석 및 처리를 수행합니다.
-
-            # 주파수 값과 일치하는 AudioFile을 찾습니다.
-            try:
-                audio = AudioFile.objects.get(frequency=data)
-                # attendance.attend = 1  # 출석 처리
-                # attendance.save()
-                # Update the attend field of specific records in the database
-                Attendance.objects.filter(student_id=student_id, course_id=course_id, attend=0).update(attend=1)
-                return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
-            except AudioFile.DoesNotExist:
-                return JsonResponse({'status': 'error', 'message': '주파수 값과 일치하는 오디오 파일이 없습니다.'})
-
-        return JsonResponse({'status': 'success'})
+        # latest_attendance = Attendance.objects.filter(course_id=course_id).order_by('-course_number').first()
+        # if latest_attendance: course_number = latest_attendance.course_number + 1
+        # else: course_number = 1
+    print(date)
+    print(student_id)
+    print(course_id)
+    try:
+        Attendance.objects.filter(student_id=student_id, course_id=course_id, date=date, attend=False).update(attend=True)
+        return JsonResponse({'status': 'success', 'message': '출석 처리 완료'})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': '오류가 발생했습니다.'})
+        # return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error', 'message': 'POST 요청이 아닙니다.'})
