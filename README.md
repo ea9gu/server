@@ -1,25 +1,19 @@
+# 비가청 주파수를 활용한 수업 출석체크 앱, 공책
 
-### 초기 설정
+이화여자대학교 2023 상반기 졸업프로젝트
 
-```shell
-server % docker-compose up --build
-```
 
-docker-compose up -d
+### Local
 
----
+```docker-compose up --build```
 
-docker build .
-docker-compose build
-docker-compose up
 
----
+## System Architecture
 
-settings.py가 바뀌면 `docker-compose up --build` 필요
+<img width="580" alt="architecture" src="https://github.com/ea9gu/server/assets/69420512/0d31b4da-f6ca-43bf-a10e-ad937bdd58c0">
 
----
 
-# 구현 API
+## 구현 API
 
 ## 로그인 & 회원가입 관련
 ✔ 로그인: /user/account/login/
@@ -52,44 +46,11 @@ settings.py가 바뀌면 `docker-compose up --build` 필요
 
 ---
 
-```mysql
-mysql -u root -p
+### Database Table List
 
-USE test;
-
-SHOW tables;
-
-SELECT * FROM class_course;
-
-INSERT INTO class_course (course_id, name, professor_id)
-    -> VALUES ('C001', 'Mathematics', 123),
-    ->        ('C002', 'Physics', 456),
-    ->        ('C003', 'Chemistry', 789);
-Query OK, 3 rows affected (0.06 sec)
-
-mysql> INSERT INTO class_studentcourse (student_id, course_id_id)
-    -> VALUES (1, (SELECT id FROM class_course WHERE course_id = 'C001')),
-    -> (1, (SELECT id FROM class_course WHERE course_id = 'C002')),
-    -> (2, (SELECT id FROM class_course WHERE course_id = 'C001')),
-    -> (3, (SELECT id FROM class_course WHERE course_id = 'C003'));
-Query OK, 4 rows affected (0.04 sec)
-Records: 4  Duplicates: 0  Warnings: 0
 ```
-
----
-
-### app name 바꾸었을 때 table 이름 변경 처리
-
-```mysql
-mysql> alter table class_course rename to classfile_course;
-mysql> alter table class_studentcourse rename to classfile_studentcourse;
-```
-
----
-
-```shell
 +--------------------------------+
-| Tables_in_test                 |
+| Tables                |
 +--------------------------------+
 | account_emailaddress           |
 | account_emailconfirmation      |
@@ -100,8 +61,8 @@ mysql> alter table class_studentcourse rename to classfile_studentcourse;
 | auth_group_permissions         |
 | auth_permission                |
 | authtoken_token                |
-| class_course                   |
-| class_studentcourse            |
+| classfile_course               |
+| classfile_studentcourse        |
 | django_admin_log               |
 | django_content_type            |
 | django_migrations              |
@@ -116,3 +77,11 @@ mysql> alter table class_studentcourse rename to classfile_studentcourse;
 | socialaccount_socialtoken      |
 +--------------------------------+
 ```
+
+### 👋 Team Ea9gu
+
+2022.09 ~ 2023.06
+
+|김주연 <br> |김유민 <br> |장예서 <br> |
+|:---:|:---:|:---:|
+|Frontend<br>UI/UX|Frontend<br>UI/UX|Backend<br>DevOps|
