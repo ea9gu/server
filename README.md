@@ -1,48 +1,60 @@
-# 비가청 주파수를 활용한 수업 출석체크 앱, 공책
+# 📚 비가청 주파수를 활용한 수업 출석체크 앱, 공책
 
 이화여자대학교 2023 상반기 졸업프로젝트
 
 
-### Local
-
-```docker-compose up --build```
-
-
-## System Architecture
+## 💫 System Architecture
 
 <img width="580" alt="architecture" src="https://github.com/ea9gu/server/assets/69420512/0d31b4da-f6ca-43bf-a10e-ad937bdd58c0">
 
 
-## 구현 API
+## 💫 구현 API
 
-## 로그인 & 회원가입 관련
-✔ 로그인: /user/account/login/
+### 로그인 & 회원가입 관련
 
-✔ 로그아웃: /user/account/password/logout/
-
-✔ 회원가입: /user/account/signup/
-
-✔ 비밀번호 변경: /user/account/password/change/
-
-✔ 비밀번호 리셋: /user/account/password/reset/
-
-## 주파수 주고받기 관련
-✔ 교수 앱에서 주파수 생성 요청: /freq/generate-freq/
-
-✔ 학생 앱에서 주파수 확인 및 출석체크 요청: /freq/save-attendance/
-
-## 기기 등록 관련
-✔ 기기 등록: /serial/save-device/
+|Method <br> |URL <br> |Description <br> |
+|:---:|:---:|:---:|
+|`POST`|/user/account/mylogin/|login|
+|`POST`|/user/account/view_user_info/|view user information|
+|`POST`|/user/account/signup/|회원 가입|
+|`POST`|/user/account/password/change/|비밀번호 변경|
+|`POST`|/user/account/password/reset/|비밀번호 리셋|
 
 
-## 수업 등록 및 관리 관련
-✔ 수업 등록: /class/create-and-enroll/
-<!-- ✔ 수업 등록: /class/create-course/
+### 주파수 수신 & 발신 & 확인
+|Method <br> |URL <br> |Description <br> |
+|:---:|:---:|:---:|
+|`GET`|/freq/generate-freq/|교수 출석 체크 시 주파수 생성 및 발생|
+|`POST`|/freq/save-attendance/|학생 출석 체크 시 주파수 확인 및 출석 체크|
 
-✔ csv 파일로 수강 학생 등록: /class/enroll-students/ -->
 
-## 과목 정보 관련
-✔ 특정 학생이 듣는 모든 수업 정보 가져오기: /class/student-course/
+### 기기 등록 
+|Method <br> |URL <br> |Description <br> |
+|:---:|:---:|:---:|
+|`POST`|/serial/save-device/|유효한 기기 등록|
+
+
+### 수업 정보 
+|Method <br> |URL <br> |Description <br> |
+|:---:|:---:|:---:|
+|`POST`|/class/create-and-enroll/|새로운 수업 등록|
+|`POST`|/class/sutdent-course/|특정 학생이 듣는 모든 수업 정보 추출|
+|`POST`|/class/prof-course/|특정 교수의 모든 수업 정보 추출|
+
+### 출석 체크
+|Method <br> |URL <br> |Description <br> |
+|:---:|:---:|:---:|
+|`POST`|/class/activate-signal/|수업 출석 체크 버튼 활성화|
+|`POST`|/class/fix-attendance/|학생의 출석 체크를 교수가 임의로 변경 시 출석 정보 변경|
+
+---
+
+
+## 💫 Run in Local
+
+```docker-compose up --build```
+
+.env file 지정 필요
 
 ---
 
