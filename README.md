@@ -5,7 +5,8 @@
 
 ## 💫 System Architecture
 
-<img width="580" alt="architecture" src="https://github.com/ea9gu/server/assets/69420512/0d31b4da-f6ca-43bf-a10e-ad937bdd58c0">
+<img width="580" alt="architecture" src="https://github.com/ea9gu/server/assets/69420512/f675ffe0-1b93-47ea-a1ba-abcdca9b46fb">
+
 
 
 ## 💫 구현 API
